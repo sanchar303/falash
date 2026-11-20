@@ -1,13 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ne">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Falas — Nepali Card Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>फलास</title>
+  <meta name="description" content="फलास (Falas) — Real-time peer-to-peer multiplayer Nepali card game. Play Blind, Chaal, Side Show, Trial, Double Run, and Jut with friends with instant zero-leak card privacy and automatic settlement." />
+  <meta name="keywords" content="फलास, Falas, Falas card game, Nepali card game, Nepali Falas online, Teen Patti Nepal, P2P card game, Trial, Double Run, Jut, multiplayer card game" />
+  <meta name="author" content="फलास" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#031b13" />
+  <meta name="application-name" content="फलास" />
+  <meta name="apple-mobile-web-app-title" content="फलास" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="फलास" />
+  <meta property="og:title" content="फलास — Nepali Multiplayer Card Game" />
+  <meta property="og:description" content="Play authentic Nepali फलास (Falas) live peer-to-peer with friends. Private cards, smooth Silk-Morphism table, and instant settlement." />
+  <meta property="og:image" content="favicon.png" />
+  <meta property="og:locale" content="ne_NP" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="फलास — Nepali Multiplayer Card Game" />
+  <meta name="twitter:description" content="Play authentic Nepali फलास (Falas) live peer-to-peer with friends. Private cards, smooth Silk-Morphism table, and instant settlement." />
+  <meta name="twitter:image" content="favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "फलास",
+    "alternateName": ["Falas", "Falas Nepali Card Game"],
+    "applicationCategory": "GameApplication",
+    "genre": "Card Game",
+    "operatingSystem": "All",
+    "inLanguage": ["ne", "en"],
+    "image": "favicon.png",
+    "description": "Real-time peer-to-peer multiplayer Nepali Falas card game with private card viewing, Side Show, and automatic debt settlement.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "NPR"
+    }
+  }
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS for Serverless WebRTC P2P Multiplayer -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-  <!-- QRCode.js for instant camera scan join -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,9 +64,9 @@
           },
           colors: {
             felt: {
-              800: '#0b3d2d',
-              900: '#06261b',
-              950: '#031610'
+              800: '#0a3b2b',
+              900: '#05241a',
+              950: '#02130d'
             }
           }
         }
@@ -32,41 +74,209 @@
     };
   </script>
   <style>
+    :root {
+      --silk-bg-deep: #02110c;
+      --silk-bg-mid: #06291e;
+      --silk-bg-glow: #0e4f3a;
+      --silk-border: rgba(167, 243, 208, 0.18);
+      --silk-gold: rgba(251, 191, 36, 0.36);
+      --silk-highlight: rgba(255, 255, 255, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background: radial-gradient(circle at 50% 10%, #0e4c38 0%, #052017 55%, #02100b 100%);
+      background-color: var(--silk-bg-deep);
+      background-image:
+        radial-gradient(ellipse 80% 55% at 50% 0%, rgba(16, 185, 129, 0.22) 0%, transparent 65%),
+        radial-gradient(circle at 15% 85%, rgba(5, 150, 105, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+        linear-gradient(180deg, #062b1f 0%, #031912 52%, #010c08 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       color: #f8fafc;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Custom tactile div button feel */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        repeating-linear-gradient(
+          115deg,
+          rgba(255, 255, 255, 0.014) 0px,
+          rgba(255, 255, 255, 0.014) 1px,
+          transparent 1px,
+          transparent 14px
+        );
+      opacity: 0.7;
+    }
+
+    .silk-surface {
+      position: relative;
+      background: linear-gradient(
+        145deg,
+        rgba(14, 72, 53, 0.62) 0%,
+        rgba(6, 39, 28, 0.76) 52%,
+        rgba(3, 21, 15, 0.88) 100%
+      );
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      border: 1px solid var(--silk-border);
+      box-shadow:
+        0 24px 48px -14px rgba(0, 0, 0, 0.68),
+        0 4px 16px -2px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 0 var(--silk-highlight),
+        inset 0 -1px 0 0 rgba(16, 185, 129, 0.14);
+    }
+
+    .silk-inset {
+      background: linear-gradient(
+        165deg,
+        rgba(2, 16, 11, 0.82) 0%,
+        rgba(4, 26, 19, 0.72) 100%
+      );
+      backdrop-filter: blur(14px) saturate(140%);
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      border: 1px solid rgba(110, 231, 183, 0.16);
+      box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.45),
+        0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .silk-bar {
+      background: linear-gradient(
+        180deg,
+        rgba(4, 27, 19, 0.84) 0%,
+        rgba(2, 16, 11, 0.94) 100%
+      );
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .silk-input {
+      background: rgba(2, 15, 11, 0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(52, 211, 153, 0.24);
+      box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.48),
+        0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .silk-input:hover {
+      border-color: rgba(110, 231, 183, 0.42);
+      background: rgba(3, 20, 14, 0.88);
+    }
+
+    .silk-input:focus {
+      border-color: #fbbf24;
+      background: rgba(3, 22, 16, 0.95);
+      box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.45),
+        0 0 0 3px rgba(251, 191, 36, 0.18),
+        0 8px 20px -6px rgba(251, 191, 36, 0.25);
+    }
+
     .btn-div {
+      position: relative;
+      overflow: hidden;
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
-      transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      transform: translateY(0) scale(1);
+      box-shadow:
+        0 6px 16px -4px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+      transition:
+        transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        filter 0.2s ease,
+        opacity 0.2s ease;
     }
-    .btn-div:active:not([data-disabled="true"]) {
-      transform: scale(0.96);
-    }
-    .btn-div[data-disabled="true"] {
-      opacity: 0.42;
+
+    .btn-div::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -130%;
+      width: 90%;
+      height: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.24) 50%,
+        transparent 100%
+      );
+      transform: skewX(-20deg);
+      transition: left 0.55s cubic-bezier(0.22, 1, 0.36, 1);
       pointer-events: none;
     }
 
-    /* Subtle casino felt texture */
-    .felt-panel {
-      background:
-        radial-gradient(ellipse at center, rgba(16, 185, 129, 0.12) 0%, rgba(3, 22, 16, 0.82) 78%),
-        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.012) 0px, rgba(255, 255, 255, 0.012) 2px, transparent 2px, transparent 6px);
+    @media (hover: hover) {
+      .btn-div:hover:not([data-disabled="true"]) {
+        transform: translateY(-2px) scale(1.015);
+        filter: brightness(1.06);
+        box-shadow:
+          0 12px 24px -6px rgba(0, 0, 0, 0.55),
+          0 0 18px -4px rgba(16, 185, 129, 0.35),
+          inset 0 1px 0 0 rgba(255, 255, 255, 0.34);
+      }
+      .btn-div:hover:not([data-disabled="true"])::after {
+        left: 150%;
+      }
     }
 
-    /* GPU-Accelerated 3D Card Flip Container (Zero Flicker / Zero Lag) */
-    .card-scene {
-      perspective: 1000px;
-      transform: translateZ(0);
+    .btn-div:active:not([data-disabled="true"]) {
+      transform: translateY(1px) scale(0.955);
+      filter: brightness(0.96);
+      box-shadow:
+        0 2px 8px -2px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.28);
+      transition-duration: 0.08s;
     }
+
+    .btn-div[data-disabled="true"] {
+      opacity: 0.4;
+      pointer-events: none;
+      transform: none;
+    }
+
+    .felt-panel {
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.2) 0%, rgba(4, 28, 20, 0.78) 78%),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 2px, transparent 2px, transparent 8px);
+      backdrop-filter: blur(22px) saturate(165%);
+      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      box-shadow:
+        0 20px 40px -14px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    .card-scene {
+      perspective: 1100px;
+      transform: translateZ(0);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (hover: hover) {
+      .card-scene:hover {
+        transform: translateY(-4px) scale(1.03);
+      }
+    }
+
     .card-flipper {
       position: relative;
       width: 100%;
@@ -74,11 +284,13 @@
       transform-style: preserve-3d;
       -webkit-transform-style: preserve-3d;
       will-change: transform;
-      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
     }
+
     .card-flipper.is-flipped {
       transform: rotateY(180deg);
     }
+
     .card-face {
       position: absolute;
       inset: 0;
@@ -86,119 +298,99 @@
       -webkit-backface-visibility: hidden;
       transform: translateZ(0);
     }
+
     .card-face-front {
       transform: rotateY(180deg) translateZ(1px);
-      background: linear-gradient(155deg, #ffffff 0%, #f1f5f9 100%);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.48), inset 0 0 0 1px rgba(148, 163, 184, 0.45);
+      background: linear-gradient(155deg, #ffffff 0%, #f8fafc 55%, #e2e8f0 100%);
+      box-shadow:
+        0 14px 28px -6px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 #ffffff,
+        inset 0 0 0 1px rgba(148, 163, 184, 0.45);
     }
+
     .card-face-back {
       transform: rotateY(0deg) translateZ(1px);
       background:
-        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.22) 0%, transparent 68%),
-        repeating-linear-gradient(45deg, #7f1d1d 0px, #7f1d1d 5px, #991b1b 5px, #991b1b 10px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.48), inset 0 0 0 2px #fbbf24;
+        radial-gradient(circle at 50% 45%, rgba(251, 191, 36, 0.28) 0%, transparent 68%),
+        repeating-linear-gradient(45deg, #064e3b 0px, #064e3b 5px, #047857 5px, #047857 10px);
+      box-shadow:
+        0 14px 28px -6px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 0 0 2px #fbbf24;
     }
 
-    /* Staggered card deal entrance (runs ONLY once per new round) */
     @keyframes cardDeal {
       0% {
         opacity: 0;
-        transform: translateY(-16px) scale(0.9);
+        transform: translateY(-20px) scale(0.88);
       }
       100% {
         opacity: 1;
         transform: translateY(0) scale(1);
       }
     }
+
     .animate-card-deal {
-      animation: cardDeal 0.36s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-    .btn-div:active:not([data-disabled="true"]) {
-      transform: scale(0.96);
-    }
-    .btn-div[data-disabled="true"] {
-      opacity: 0.45;
-      pointer-events: none;
-    }
-
-    /* Subtle casino felt texture */
-    .felt-panel {
-      background:
-        radial-gradient(ellipse at center, rgba(16, 185, 129, 0.12) 0%, rgba(3, 22, 16, 0.78) 78%),
-        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.012) 0px, rgba(255, 255, 255, 0.012) 2px, transparent 2px, transparent 6px);
-    }
-
-    /* 3D Card Flip Container & Smooth Transitions */
-    .card-scene {
-      perspective: 900px;
-    }
-    .card-flipper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .card-flipper.is-flipped {
-      transform: rotateY(180deg);
-    }
-    .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-    .card-face-front {
-      transform: rotateY(180deg);
-      background: linear-gradient(150deg, #ffffff 0%, #f1f5f9 100%);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.48), inset 0 0 0 1px rgba(148, 163, 184, 0.4);
-    }
-    .card-face-back {
-      background:
-        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.22) 0%, transparent 68%),
-        repeating-linear-gradient(45deg, #7f1d1d 0px, #7f1d1d 5px, #991b1b 5px, #991b1b 10px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.48), inset 0 0 0 2px #fbbf24;
-    }
-
-    /* Staggered card deal entrance */
-    @keyframes cardDeal {
-      0% {
-        opacity: 0;
-        transform: translateY(-18px) scale(0.88) rotate(-4deg);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0) scale(1) rotate(0deg);
-      }
-    }
-    .animate-card-deal {
-      animation: cardDeal 0.38s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+      animation: cardDeal 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
     @keyframes fadeSlideUp {
       from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(14px) scale(0.985);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
+
     .animate-view {
-      animation: fadeSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: fadeSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes modalSpring {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.93);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-modal {
+      animation: modalSpring 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     @keyframes pulseTurn {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.45);
+        box-shadow:
+          0 0 0 0 rgba(251, 191, 36, 0.48),
+          0 20px 42px -12px rgba(0, 0, 0, 0.65),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
       50% {
-        box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+        box-shadow:
+          0 0 0 10px rgba(251, 191, 36, 0),
+          0 20px 42px -12px rgba(0, 0, 0, 0.65),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
     }
+
     .turn-glow {
-      animation: pulseTurn 1.8s infinite;
+      animation: pulseTurn 1.75s infinite;
+    }
+
+    .opp-silk-card {
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease;
+    }
+
+    @media (hover: hover) {
+      .opp-silk-card:hover {
+        transform: translateY(-2px);
+      }
     }
 
     #lobbyQrBox img,
@@ -208,44 +400,40 @@
     }
   </style>
 </head>
-<body class="antialiased selection:bg-amber-400 selection:text-felt-950 pb-32">
+<body class="antialiased selection:bg-amber-400 selection:text-felt-950 pb-32 relative">
 
-  <!-- Minimal Top Bar -->
-  <header class="sticky top-0 z-30 bg-felt-950/85 backdrop-blur-md border-b border-amber-500/20 px-4 sm:px-6 py-3">
+  <header class="sticky top-0 z-30 silk-bar border-b border-emerald-400/20 px-4 sm:px-6 py-3">
     <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-felt-950 flex items-center justify-center font-display font-black text-lg shadow-md">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 text-felt-950 flex items-center justify-center font-display font-black text-lg shadow-lg shadow-amber-500/20 ring-1 ring-white/30">
           फ
         </div>
-        <span class="font-display text-lg sm:text-xl font-extrabold tracking-tight text-white">FALAS</span>
+        <span class="font-display text-lg sm:text-xl font-extrabold tracking-tight text-white drop-shadow">फलास</span>
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Room Badge -->
-        <div id="headerRoomPill" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-felt-900 border border-amber-400/30 text-xs">
+        <div id="headerRoomPill" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl silk-inset border border-amber-400/35 text-xs">
           <span id="headerConnDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span id="headerRoomCode" class="font-black tracking-widest text-amber-300">----</span>
         </div>
 
-        <!-- HOST ONLY: Secure Stop & Settle Money Trigger -->
         <div
           id="btnHostStopSettle"
           role="button"
           tabindex="0"
-          onclick="openSettleConfirmModal()"
-          class="hidden btn-div px-3 py-1.5 rounded-xl bg-rose-950/85 hover:bg-rose-900 border border-rose-400/40 text-rose-200 text-xs font-bold flex items-center gap-1.5 shadow"
+          onclick="haptic(18); openSettleConfirmModal()"
+          class="hidden btn-div px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-950/90 to-rose-900/90 border border-rose-400/45 text-rose-200 text-xs font-bold flex items-center gap-1.5"
         >
           <span class="w-2 h-2 rounded-full bg-rose-400"></span>
           <span>Stop &amp; Settle</span>
         </div>
 
-        <!-- Minimal Rules Icon -->
         <div
           role="button"
           tabindex="0"
-          onclick="openRulesModal()"
+          onclick="haptic(10); openRulesModal()"
           aria-label="Rules"
-          class="btn-div w-9 h-9 rounded-xl bg-felt-900 hover:bg-emerald-900 border border-emerald-500/25 text-amber-300 font-extrabold text-sm flex items-center justify-center"
+          class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 font-extrabold text-sm flex items-center justify-center"
         >
           ?
         </div>
@@ -253,23 +441,18 @@
     </div>
   </header>
 
-  <!-- Minimal Toast Stack -->
   <div id="toastStack" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-full max-w-sm px-4"></div>
 
-  <!-- ===================================================================== -->
-  <!-- SCREEN 1: LANDING (NEW TABLE OR JOIN EXISTING TABLE)                  -->
-  <!-- ===================================================================== -->
-  <section id="hostSetupScreen" class="max-w-md mx-auto px-4 pt-7 sm:pt-11 animate-view">
-    <div class="rounded-3xl bg-gradient-to-b from-felt-800/95 to-felt-900/95 border border-amber-500/30 shadow-2xl p-5 sm:p-7">
+  <section id="hostSetupScreen" class="relative z-10 max-w-md mx-auto px-4 pt-7 sm:pt-11 animate-view">
+    <div class="rounded-3xl silk-surface p-5 sm:p-7">
 
-      <!-- Prominent Dual Mode Switcher: New Table vs Join Existing Table -->
-      <div class="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-felt-950/90 border border-emerald-500/20 mb-6">
+      <div class="grid grid-cols-2 gap-2 p-1.5 rounded-2xl silk-inset mb-6">
         <div
           id="tabCreateTable"
           role="button"
           tabindex="0"
-          onclick="switchLandingMode('create')"
-          class="btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center shadow"
+          onclick="haptic(12); switchLandingMode('create')"
+          class="btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center"
         >
           New Table
         </div>
@@ -277,40 +460,37 @@
           id="tabJoinTable"
           role="button"
           tabindex="0"
-          onclick="switchLandingMode('join')"
-          class="btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center"
+          onclick="haptic(12); switchLandingMode('join')"
+          class="btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none"
         >
           Join Existing Table
         </div>
       </div>
 
-      <!-- PANEL A: NEW TABLE SETUP (First Visitor) -->
       <div id="landingCreatePanel" class="space-y-4">
-        <!-- Your Name -->
         <div>
-          <label for="hostNameInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-300/80 mb-1.5">Your Name</label>
+          <label for="hostNameInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-200/85 mb-1.5">Your Name</label>
           <input
             id="hostNameInput"
             type="text"
             maxlength="16"
             placeholder="Enter your name"
             onkeydown="if (event.key === 'Enter') completeHostSetup()"
-            class="w-full bg-felt-950/90 border border-emerald-500/30 focus:border-amber-400 rounded-2xl px-4 py-3 text-base font-bold text-white placeholder-emerald-500/35 focus:outline-none transition"
+            class="w-full silk-input rounded-2xl px-4 py-3 text-base font-bold text-white placeholder-emerald-400/35 focus:outline-none"
           />
         </div>
 
-        <!-- Number of Players -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300/80">Players</span>
-            <span class="text-[11px] font-semibold text-emerald-400/60">2 – 17</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-200/85">Players</span>
+            <span class="text-[11px] font-semibold text-emerald-300/65">2 – 17</span>
           </div>
           <div class="flex items-center gap-2">
             <div
               role="button"
               tabindex="0"
-              onclick="stepPlayerCount(-1)"
-              class="btn-div w-12 h-12 rounded-2xl bg-felt-950 hover:bg-emerald-900 border border-emerald-500/30 text-white font-black text-xl flex items-center justify-center shrink-0"
+              onclick="haptic(10); stepPlayerCount(-1)"
+              class="btn-div w-12 h-12 rounded-2xl silk-inset hover:border-emerald-400/45 text-white font-black text-xl flex items-center justify-center shrink-0"
             >
               −
             </div>
@@ -321,22 +501,21 @@
               max="17"
               value="4"
               onblur="clampPlayerCountInput()"
-              class="flex-1 h-12 text-center bg-felt-950/90 border border-amber-400/40 focus:border-amber-400 rounded-2xl text-xl font-black text-white focus:outline-none"
+              class="flex-1 h-12 text-center silk-input rounded-2xl text-xl font-black text-white focus:outline-none"
             />
             <div
               role="button"
               tabindex="0"
-              onclick="stepPlayerCount(1)"
-              class="btn-div w-12 h-12 rounded-2xl bg-felt-950 hover:bg-emerald-900 border border-emerald-500/30 text-white font-black text-xl flex items-center justify-center shrink-0"
+              onclick="haptic(10); stepPlayerCount(1)"
+              class="btn-div w-12 h-12 rounded-2xl silk-inset hover:border-emerald-400/45 text-white font-black text-xl flex items-center justify-center shrink-0"
             >
               +
             </div>
           </div>
         </div>
 
-        <!-- Bet Amount -->
         <div>
-          <label for="betAmountInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-300/80 mb-1.5">Bet Amount</label>
+          <label for="betAmountInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-200/85 mb-1.5">Bet Amount</label>
           <div class="relative mb-2">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-extrabold text-amber-400">Rs.</span>
             <input
@@ -345,41 +524,39 @@
               min="1"
               value="20"
               onkeydown="if (event.key === 'Enter') completeHostSetup()"
-              class="w-full bg-felt-950/90 border border-amber-400/40 focus:border-amber-400 rounded-2xl pl-12 pr-4 py-3 text-lg font-black text-white focus:outline-none"
+              class="w-full silk-input rounded-2xl pl-12 pr-4 py-3 text-lg font-black text-white focus:outline-none"
             />
           </div>
           <div class="grid grid-cols-4 gap-1.5">
-            <div role="button" tabindex="0" onclick="setQuickBet(10)" class="btn-div py-1.5 rounded-xl bg-felt-950/80 hover:bg-emerald-900 border border-emerald-500/25 text-center text-xs font-bold text-emerald-200">10</div>
-            <div role="button" tabindex="0" onclick="setQuickBet(20)" class="btn-div py-1.5 rounded-xl bg-felt-950/80 hover:bg-emerald-900 border border-emerald-500/25 text-center text-xs font-bold text-emerald-200">20</div>
-            <div role="button" tabindex="0" onclick="setQuickBet(50)" class="btn-div py-1.5 rounded-xl bg-felt-950/80 hover:bg-emerald-900 border border-emerald-500/25 text-center text-xs font-bold text-emerald-200">50</div>
-            <div role="button" tabindex="0" onclick="setQuickBet(100)" class="btn-div py-1.5 rounded-xl bg-felt-950/80 hover:bg-emerald-900 border border-emerald-500/25 text-center text-xs font-bold text-emerald-200">100</div>
+            <div role="button" tabindex="0" onclick="haptic(8); setQuickBet(10)" class="btn-div py-1.5 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">10</div>
+            <div role="button" tabindex="0" onclick="haptic(8); setQuickBet(20)" class="btn-div py-1.5 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">20</div>
+            <div role="button" tabindex="0" onclick="haptic(8); setQuickBet(50)" class="btn-div py-1.5 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">50</div>
+            <div role="button" tabindex="0" onclick="haptic(8); setQuickBet(100)" class="btn-div py-1.5 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">100</div>
           </div>
         </div>
 
-        <!-- Complete Setup Button (Custom Div) -->
         <div
           id="btnCompleteSetup"
           role="button"
           tabindex="0"
-          onclick="completeHostSetup()"
-          class="btn-div mt-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-felt-950 font-black text-base text-center shadow-xl shadow-amber-500/20"
+          onclick="haptic(18); completeHostSetup()"
+          class="btn-div mt-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center"
         >
           Complete Setup
         </div>
       </div>
 
-      <!-- PANEL B: JOIN EXISTING TABLE (Appealing, Clear Code Entry) -->
       <div id="landingJoinPanel" class="hidden space-y-4">
-        <div class="rounded-2xl bg-felt-950/75 border border-emerald-500/20 p-4 text-center">
-          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 flex items-center justify-center mx-auto mb-2.5 text-lg font-black">
+        <div class="rounded-2xl silk-inset p-4 text-center">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-400/15 border border-emerald-400/35 text-emerald-300 flex items-center justify-center mx-auto mb-2.5 text-lg font-black shadow-inner">
             ♠
           </div>
           <h2 class="font-display text-xl font-extrabold text-white">Join Existing Table</h2>
-          <p class="text-xs text-emerald-300/75 mt-1">Enter the 4-letter table code from the host</p>
+          <p class="text-xs text-emerald-200/75 mt-1">Enter the 4-letter table code from the host</p>
         </div>
 
         <div>
-          <label for="landingJoinCodeInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-300/80 mb-1.5">Table Code</label>
+          <label for="landingJoinCodeInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-200/85 mb-1.5">Table Code</label>
           <input
             id="landingJoinCodeInput"
             type="text"
@@ -387,7 +564,7 @@
             placeholder="ABCD"
             oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
             onkeydown="if (event.key === 'Enter') connectFromLandingJoin()"
-            class="w-full bg-felt-950/90 border border-amber-400/45 focus:border-amber-400 rounded-2xl px-4 py-3.5 text-center tracking-[0.28em] uppercase text-2xl font-black text-amber-300 placeholder-emerald-500/30 focus:outline-none transition"
+            class="w-full silk-input rounded-2xl px-4 py-3.5 text-center tracking-[0.28em] uppercase text-2xl font-black text-amber-300 placeholder-emerald-400/30 focus:outline-none"
           />
         </div>
 
@@ -395,8 +572,8 @@
           id="btnLandingConnect"
           role="button"
           tabindex="0"
-          onclick="connectFromLandingJoin()"
-          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-amber-400 hover:from-emerald-300 hover:to-amber-300 text-felt-950 font-black text-base text-center shadow-xl shadow-emerald-500/20"
+          onclick="haptic(18); connectFromLandingJoin()"
+          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-base text-center"
         >
           Find Table →
         </div>
@@ -404,20 +581,15 @@
     </div>
   </section>
 
-  <!-- ===================================================================== -->
-  <!-- SCREEN 2: VISITOR JOIN / ENTER NAME SCREEN                            -->
-  <!-- ===================================================================== -->
-  <section id="visitorJoinScreen" class="hidden max-w-md mx-auto px-4 pt-8 sm:pt-12 animate-view">
-    <div class="rounded-3xl bg-gradient-to-b from-felt-800/95 to-felt-900/95 border border-amber-500/30 shadow-2xl p-6 sm:p-8 text-center">
-      <!-- Dynamic seat counter badge -->
+  <section id="visitorJoinScreen" class="hidden relative z-10 max-w-md mx-auto px-4 pt-8 sm:pt-12 animate-view">
+    <div class="rounded-3xl silk-surface p-6 sm:p-8 text-center">
       <div id="visitorSeatProgressBadge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-300 text-xs font-extrabold mb-3">
         Connecting...
       </div>
 
       <h2 id="visitorHeading" class="font-display text-2xl sm:text-3xl font-extrabold text-white mb-1.5">Enter Your Name</h2>
-      <p id="visitorTableSubtext" class="text-xs text-emerald-300/75 mb-5">Connecting to table...</p>
+      <p id="visitorTableSubtext" class="text-xs text-emerald-200/80 mb-5">Connecting to table...</p>
 
-      <!-- Visitor Name Input & Join / Start Action -->
       <div id="visitorNameForm" class="space-y-4 text-left">
         <div>
           <input
@@ -426,17 +598,16 @@
             maxlength="16"
             placeholder="Your name"
             onkeydown="if (event.key === 'Enter') submitVisitorName()"
-            class="w-full bg-felt-950/90 border border-emerald-500/35 focus:border-amber-400 rounded-2xl px-4 py-3.5 text-center text-lg font-bold text-white placeholder-emerald-500/35 focus:outline-none transition"
+            class="w-full silk-input rounded-2xl px-4 py-3.5 text-center text-lg font-bold text-white placeholder-emerald-400/35 focus:outline-none"
           />
         </div>
 
-        <!-- Dynamically says "Join Table" OR "Start Game" for the LAST visitor! -->
         <div
           id="btnVisitorJoinOrStart"
           role="button"
           tabindex="0"
-          onclick="submitVisitorName()"
-          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-felt-950 font-black text-base text-center shadow-xl shadow-amber-500/20"
+          onclick="haptic(20); submitVisitorName()"
+          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center"
         >
           Join Table
         </div>
@@ -445,8 +616,8 @@
           <div
             role="button"
             tabindex="0"
-            onclick="backToLandingJoin()"
-            class="btn-div inline-block text-xs font-semibold text-emerald-300/70 hover:text-amber-300"
+            onclick="haptic(10); backToLandingJoin()"
+            class="btn-div inline-block px-3 py-1 rounded-xl text-xs font-semibold text-emerald-200/75 hover:text-amber-300 shadow-none"
           >
             ← Change Table Code
           </div>
@@ -455,42 +626,35 @@
     </div>
   </section>
 
-  <!-- ===================================================================== -->
-  <!-- SCREEN 3: MINIMAL WAITING LOBBY (Shown after entering name)           -->
-  <!-- ===================================================================== -->
-  <section id="lobbyScreen" class="hidden max-w-lg mx-auto px-4 pt-6 sm:pt-10 animate-view">
-    <div class="rounded-3xl bg-gradient-to-b from-felt-800/95 to-felt-900/95 border border-amber-500/30 shadow-2xl p-6 sm:p-7">
+  <section id="lobbyScreen" class="hidden relative z-10 max-w-lg mx-auto px-4 pt-6 sm:pt-10 animate-view">
+    <div class="rounded-3xl silk-surface p-6 sm:p-7">
       <div class="flex items-center justify-between mb-5">
         <div>
           <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Waiting for Players</span>
           <h2 id="lobbyCountHeading" class="font-display text-2xl sm:text-3xl font-extrabold text-white mt-0.5">1 / 4 Joined</h2>
         </div>
         <div class="text-right">
-          <span class="text-[11px] uppercase tracking-wider text-emerald-300/70 block">Bet</span>
+          <span class="text-[11px] uppercase tracking-wider text-emerald-200/75 block">Bet</span>
           <span id="lobbyBetLabel" class="text-base font-black text-amber-300">Rs. 20</span>
         </div>
       </div>
 
-      <!-- Joined Players List -->
-      <div id="lobbyPlayersList" class="grid grid-cols-2 gap-2.5 mb-6">
-        <!-- Player chips rendered dynamically -->
-      </div>
+      <div id="lobbyPlayersList" class="grid grid-cols-2 gap-2.5 mb-6"></div>
 
-      <!-- Compact Invite Link + QR -->
-      <div class="rounded-2xl bg-felt-950/80 border border-emerald-500/20 p-4 flex flex-col sm:flex-row items-center gap-4">
-        <div id="lobbyQrBox" class="w-28 h-28 bg-white p-1.5 rounded-xl flex items-center justify-center shrink-0"></div>
+      <div class="rounded-2xl silk-inset p-4 flex flex-col sm:flex-row items-center gap-4">
+        <div id="lobbyQrBox" class="w-28 h-28 bg-white p-1.5 rounded-xl flex items-center justify-center shrink-0 shadow-lg"></div>
         <div class="flex-1 w-full min-w-0 space-y-2.5 text-center sm:text-left">
           <div class="flex items-center justify-center sm:justify-start gap-2">
-            <span class="text-xs text-emerald-300/75 font-semibold">Code:</span>
+            <span class="text-xs text-emerald-200/80 font-semibold">Code:</span>
             <span id="lobbyCodeText" class="text-lg font-black tracking-widest text-amber-400">----</span>
           </div>
           <div class="flex items-center gap-2">
-            <input id="lobbyShareInput" type="text" readonly class="flex-1 min-w-0 bg-felt-900 border border-emerald-500/25 rounded-xl px-3 py-2 text-xs text-emerald-100 select-all focus:outline-none" />
+            <input id="lobbyShareInput" type="text" readonly class="flex-1 min-w-0 silk-input rounded-xl px-3 py-2 text-xs text-emerald-100 select-all focus:outline-none" />
             <div
               role="button"
               tabindex="0"
-              onclick="copyShareUrl()"
-              class="btn-div px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-felt-950 font-extrabold text-xs shrink-0"
+              onclick="haptic(14); copyShareUrl()"
+              class="btn-div px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-extrabold text-xs shrink-0"
             >
               Copy
             </div>
@@ -500,89 +664,71 @@
     </div>
   </section>
 
-  <!-- ===================================================================== -->
-  <!-- SCREEN 4: ACTIVE GAME ARENA                                           -->
-  <!-- ===================================================================== -->
-  <main id="gameScreen" class="hidden max-w-6xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6 animate-view">
+  <main id="gameScreen" class="hidden relative z-10 max-w-6xl mx-auto px-3 sm:px-6 pt-4 sm:pt-6 animate-view">
 
-    <!-- HIGH-CLARITY TURN BANNER (Unmistakable Whose Turn It Is) -->
-    <div id="turnHeroBanner" class="rounded-2xl border px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-lg transition-colors duration-200 bg-felt-900/90 border-amber-400/35">
+    <div id="turnHeroBanner" class="rounded-2xl silk-surface px-4 py-3 mb-4 flex items-center justify-between gap-3 transition-all duration-300">
       <div class="flex items-center gap-2.5 min-w-0">
         <span id="turnHeroDot" class="w-3 h-3 rounded-full bg-amber-400 shrink-0 animate-pulse"></span>
         <span id="turnHeroTitle" class="font-extrabold text-sm sm:text-base text-white truncate">Waiting...</span>
       </div>
-      <span id="turnHeroBadge" class="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-amber-400/15 text-amber-300 border border-amber-400/30">
+      <span id="turnHeroBadge" class="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-amber-400/15 text-amber-300 border border-amber-400/35">
         Round #1
       </span>
     </div>
 
-    <!-- Minimal Table Pot & Stake Strip -->
-    <div class="felt-panel rounded-3xl border border-amber-500/25 shadow-xl px-4 py-3.5 sm:px-6 sm:py-4 mb-5">
+    <div class="felt-panel rounded-3xl border border-emerald-400/25 px-4 py-3.5 sm:px-6 sm:py-4 mb-5">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span class="text-[10px] uppercase tracking-widest font-bold text-amber-300/80 block">Pot</span>
-          <span id="potValue" class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">Rs. 0</span>
+          <span class="text-[10px] uppercase tracking-widest font-bold text-amber-300/85 block">Pot</span>
+          <span id="potValue" class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight drop-shadow">Rs. 0</span>
         </div>
 
         <div class="flex items-center gap-4 sm:gap-6">
           <div class="text-right">
-            <span class="text-[10px] uppercase tracking-widest font-bold text-emerald-300/70 block">Blind / Chaal</span>
+            <span class="text-[10px] uppercase tracking-widest font-bold text-emerald-200/75 block">Blind / Chaal</span>
             <span id="stakeValue" class="text-sm sm:text-base font-extrabold text-white">Rs. 20 / Rs. 40</span>
           </div>
           <div class="text-right">
-            <span class="text-[10px] uppercase tracking-widest font-bold text-emerald-300/70 block">Round</span>
+            <span class="text-[10px] uppercase tracking-widest font-bold text-emerald-200/75 block">Round</span>
             <span id="roundValue" class="text-sm sm:text-base font-extrabold text-white">#1</span>
           </div>
         </div>
       </div>
 
-      <!-- Single-line clean status feed -->
-      <div class="mt-3 pt-2.5 border-t border-emerald-500/15 flex items-center gap-2">
+      <div class="mt-3 pt-2.5 border-t border-emerald-400/15 flex items-center gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
         <p id="liveFeedText" class="text-xs sm:text-sm font-medium text-emerald-100/90 truncate">Ready</p>
       </div>
     </div>
 
-    <!-- YOUR PRIVATE SEAT (Persistent DOM container for zero-flicker 3D card flips) -->
     <div id="mySeatCard" class="mb-5"></div>
 
-    <!-- OTHER PLAYERS AT THE TABLE (Persistent DOM cards per seat) -->
     <div id="opponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4"></div>
   </main>
 
-  <!-- ===================================================================== -->
-  <!-- SCREEN 5: FINAL MONEY SETTLEMENT SCREEN (After Host Stops & Settles)  -->
-  <!-- ===================================================================== -->
-  <section id="settlementScreen" class="hidden max-w-2xl mx-auto px-4 pt-6 sm:pt-10 animate-view">
-    <div class="rounded-3xl bg-gradient-to-b from-felt-800/95 to-felt-900/95 border border-amber-400/40 shadow-2xl p-6 sm:p-8">
+  <section id="settlementScreen" class="hidden relative z-10 max-w-2xl mx-auto px-4 pt-6 sm:pt-10 animate-view">
+    <div class="rounded-3xl silk-surface border-amber-400/40 p-6 sm:p-8">
       <div class="text-center mb-6">
-        <span class="inline-block px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-extrabold uppercase tracking-wider mb-2">
+        <span class="inline-block px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-300 text-xs font-extrabold uppercase tracking-wider mb-2">
           Final Settlement
         </span>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-white">Who Pays Whom</h2>
-        <p id="settlementMetaSubtitle" class="text-xs text-emerald-300/75 mt-1">0 Rounds Played</p>
+        <p id="settlementMetaSubtitle" class="text-xs text-emerald-200/80 mt-1">0 Rounds Played</p>
       </div>
 
-      <!-- Optimal Smart Transfers List -->
-      <div id="settlementTransfersList" class="space-y-3 mb-7">
-        <!-- Rendered dynamically -->
+      <div id="settlementTransfersList" class="space-y-3 mb-7"></div>
+
+      <div class="border-t border-emerald-400/20 pt-5">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-200/80 mb-3">Player Net Totals</h3>
+        <div id="settlementStandingsList" class="space-y-2"></div>
       </div>
 
-      <!-- Individual Net Standings Breakdown -->
-      <div class="border-t border-emerald-500/20 pt-5">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-300/75 mb-3">Player Net Totals</h3>
-        <div id="settlementStandingsList" class="space-y-2">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-
-      <!-- Start Fresh Table -->
       <div class="mt-7 text-center">
         <div
           role="button"
           tabindex="0"
-          onclick="resetToNewTable()"
-          class="btn-div inline-block px-6 py-3 rounded-2xl bg-felt-950 hover:bg-emerald-950 border border-emerald-500/30 text-emerald-200 font-bold text-xs sm:text-sm"
+          onclick="haptic(14); resetToNewTable()"
+          class="btn-div inline-block px-6 py-3 rounded-2xl silk-inset hover:border-amber-400/45 text-emerald-100 font-bold text-xs sm:text-sm"
         >
           Start Fresh Table
         </div>
@@ -590,19 +736,13 @@
     </div>
   </section>
 
-  <!-- ===================================================================== -->
-  <!-- DOCKED ACTION BAR (Custom Div Controls)                               -->
-  <!-- ===================================================================== -->
-  <footer id="bottomActionBar" class="hidden fixed bottom-0 inset-x-0 z-30 bg-felt-950/95 backdrop-blur-lg border-t border-amber-500/25 px-3 py-3 shadow-2xl">
+  <footer id="bottomActionBar" class="hidden fixed bottom-0 inset-x-0 z-30 silk-bar border-t border-emerald-400/25 px-3 py-3">
     <div id="bottomActionContent" class="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3"></div>
   </footer>
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: SIDE SHOW RESULT COMPARISON (Shows YOUR Cards vs THEIR Cards)  -->
-  <!-- ===================================================================== -->
-  <div id="sideShowResultModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="w-full max-w-lg rounded-3xl bg-gradient-to-b from-felt-800 to-felt-950 border-2 border-amber-400/50 shadow-2xl p-5 sm:p-7 text-center animate-view">
-      <span class="inline-block px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-200 text-xs font-extrabold uppercase tracking-wider mb-2">
+  <div id="sideShowResultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-lg rounded-3xl silk-surface border-2 border-amber-400/50 p-5 sm:p-7 text-center animate-modal">
+      <span class="inline-block px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/45 text-purple-200 text-xs font-extrabold uppercase tracking-wider mb-2">
         Side Show Result
       </span>
       <h3 id="sideShowResultHeadline" class="font-display text-xl sm:text-2xl font-extrabold text-white mb-5">
@@ -610,8 +750,7 @@
       </h3>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <!-- YOUR CARDS -->
-        <div id="ssMyBox" class="rounded-2xl border-2 p-4 bg-felt-900/90">
+        <div id="ssMyBox" class="rounded-2xl border-2 p-4 silk-inset">
           <div class="flex items-center justify-between gap-2 mb-2.5">
             <span class="text-xs font-black uppercase tracking-wider text-amber-300">Your Cards</span>
             <span id="ssMyOutcomeBadge" class="px-2 py-0.5 rounded-full text-[10px] font-black">WON</span>
@@ -620,8 +759,7 @@
           <div id="ssMyHandLabel" class="mt-2.5 text-xs font-extrabold text-white"></div>
         </div>
 
-        <!-- SIDE-SHOWN OPPONENT'S CARDS -->
-        <div id="ssTheirBox" class="rounded-2xl border-2 p-4 bg-felt-900/90">
+        <div id="ssTheirBox" class="rounded-2xl border-2 p-4 silk-inset">
           <div class="flex items-center justify-between gap-2 mb-2.5">
             <span id="ssTheirTitle" class="text-xs font-black uppercase tracking-wider text-sky-300 truncate">Opponent's Cards</span>
             <span id="ssTheirOutcomeBadge" class="px-2 py-0.5 rounded-full text-[10px] font-black">LOST</span>
@@ -634,93 +772,35 @@
       <div
         role="button"
         tabindex="0"
-        onclick="closeSideShowResultModal()"
-        class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-felt-950 font-black text-sm shadow-lg"
+        onclick="haptic(12); closeSideShowResultModal()"
+        class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm"
       >
         Got It
       </div>
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: HOST SECURE "STOP & SETTLE MONEY" DOUBLE-GUARD                 -->
-  <!-- ===================================================================== -->
-  <div id="settleConfirmModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-sm rounded-3xl bg-felt-900 border border-rose-400/40 shadow-2xl p-6 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-400/35 text-rose-300 flex items-center justify-center mx-auto mb-3 text-xl font-black">
-        🔒
-      </div>
-      <h3 class="font-display text-2xl font-extrabold text-white mb-1.5">Stop &amp; Settle Game?</h3>
-      <p class="text-xs text-emerald-200/80 mb-5">
-        This ends the session for all players and calculates exact final money transfers.
-      </p>
-
-      <!-- Step 1: Safety Unlock -->
-      <div id="settleStep1Box" class="space-y-2.5">
-        <div
-          role="button"
-          tabindex="0"
-          onclick="unlockFinalSettleButton()"
-          class="btn-div w-full py-3 rounded-2xl bg-rose-950 hover:bg-rose-900 border border-rose-400/40 text-rose-200 font-extrabold text-sm"
-        >
-          Unlock Final Settlement
-        </div>
-        <div
-          role="button"
-          tabindex="0"
-          onclick="closeSettleConfirmModal()"
-          class="btn-div w-full py-2.5 rounded-2xl bg-felt-950 hover:bg-emerald-950 text-emerald-300/80 font-bold text-xs"
-        >
-          Cancel
-        </div>
-      </div>
-
-      <!-- Step 2: Final Deliberate Confirmation -->
-      <div id="settleStep2Box" class="hidden space-y-2.5">
-        <div
-          role="button"
-          tabindex="0"
-          onclick="executeHostStopAndSettle()"
-          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 text-felt-950 font-black text-sm shadow-lg"
-        >
-          Confirm Stop &amp; Settle Now
-        </div>
-        <div
-          role="button"
-          tabindex="0"
-          onclick="closeSettleConfirmModal()"
-          class="btn-div w-full py-2.5 rounded-2xl bg-felt-950 text-emerald-300/80 font-bold text-xs"
-        >
-          Keep Playing
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- MODAL: SIDE SHOW PROMPT                                               -->
-  <!-- ===================================================================== -->
-  <div id="sideShowModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-sm rounded-3xl bg-felt-900 border border-amber-400/40 shadow-2xl p-6 text-center">
-      <span class="inline-block px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-200 text-xs font-extrabold uppercase tracking-wider mb-2">
+  <div id="sideShowModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm rounded-3xl silk-surface border border-amber-400/45 p-6 text-center animate-modal">
+      <span class="inline-block px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/45 text-purple-200 text-xs font-extrabold uppercase tracking-wider mb-2">
         Side Show Request
       </span>
       <h3 class="font-display text-2xl font-extrabold text-white mb-2">Compare Cards?</h3>
-      <p id="sideShowPromptText" class="text-sm text-emerald-200/90 mb-5"></p>
+      <p id="sideShowPromptText" class="text-sm text-emerald-100/90 mb-5"></p>
       <div class="grid grid-cols-2 gap-3">
         <div
           role="button"
           tabindex="0"
-          onclick="answerSideShow(false)"
-          class="btn-div py-3 rounded-2xl bg-rose-950 hover:bg-rose-900 border border-rose-500/35 text-rose-200 font-bold text-sm"
+          onclick="haptic(14); answerSideShow(false)"
+          class="btn-div py-3 rounded-2xl bg-gradient-to-r from-rose-950 to-rose-900 border border-rose-500/40 text-rose-200 font-bold text-sm"
         >
           Decline
         </div>
         <div
           role="button"
           tabindex="0"
-          onclick="answerSideShow(true)"
-          class="btn-div py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-felt-950 font-black text-sm shadow-lg"
+          onclick="haptic(18); answerSideShow(true)"
+          class="btn-div py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm"
         >
           Compare
         </div>
@@ -728,46 +808,90 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- MODAL: QUICK HAND RANKINGS REFERENCE                                  -->
-  <!-- ===================================================================== -->
-  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-md rounded-3xl bg-felt-900 border border-amber-400/35 shadow-2xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-display text-xl font-extrabold text-white">Falas Hand Rankings</h3>
+  <div id="settleConfirmModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm rounded-3xl silk-surface border border-rose-400/45 p-6 text-center animate-modal">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-400/40 text-rose-300 flex items-center justify-center mx-auto mb-3 text-xl font-black">
+        🔒
+      </div>
+      <h3 class="font-display text-2xl font-extrabold text-white mb-1.5">Stop &amp; Settle Game?</h3>
+      <p class="text-xs text-emerald-200/80 mb-5">
+        This ends the session for all players and calculates exact final money transfers.
+      </p>
+
+      <div id="settleStep1Box" class="space-y-2.5">
         <div
           role="button"
           tabindex="0"
-          onclick="closeRulesModal()"
-          class="btn-div w-8 h-8 rounded-xl bg-felt-950 text-emerald-200 flex items-center justify-center text-sm font-bold"
+          onclick="haptic(16); unlockFinalSettleButton()"
+          class="btn-div w-full py-3 rounded-2xl bg-gradient-to-r from-rose-950 to-rose-900 border border-rose-400/45 text-rose-200 font-extrabold text-sm"
+        >
+          Unlock Final Settlement
+        </div>
+        <div
+          role="button"
+          tabindex="0"
+          onclick="haptic(10); closeSettleConfirmModal()"
+          class="btn-div w-full py-2.5 rounded-2xl silk-inset text-emerald-200/85 font-bold text-xs"
+        >
+          Cancel
+        </div>
+      </div>
+
+      <div id="settleStep2Box" class="hidden space-y-2.5">
+        <div
+          role="button"
+          tabindex="0"
+          onclick="haptic([20, 40, 30]); executeHostStopAndSettle()"
+          class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-felt-950 font-black text-sm"
+        >
+          Confirm Stop &amp; Settle Now
+        </div>
+        <div
+          role="button"
+          tabindex="0"
+          onclick="haptic(10); closeSettleConfirmModal()"
+          class="btn-div w-full py-2.5 rounded-2xl silk-inset text-emerald-200/85 font-bold text-xs"
+        >
+          Keep Playing
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl silk-surface border border-amber-400/40 p-6 animate-modal">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-xl font-extrabold text-white">फलास Hand Rankings</h3>
+        <div
+          role="button"
+          tabindex="0"
+          onclick="haptic(10); closeRulesModal()"
+          class="btn-div w-8 h-8 rounded-xl silk-inset text-emerald-200 flex items-center justify-center text-sm font-bold"
         >
           ✕
         </div>
       </div>
 
-      <div class="space-y-2 text-xs text-emerald-100/90">
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">1. Trial</strong><span>Three of a Kind (A-A-A highest)</span></div>
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">2. Double Run</strong><span>Pure Sequence (A-K-Q &gt; A-2-3 &gt; K-Q-J)</span></div>
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">3. Run</strong><span>Mixed Sequence (A-K-Q &gt; A-2-3 &gt; K-Q-J)</span></div>
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">4. Color</strong><span>Flush (Same suit)</span></div>
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">5. Jut</strong><span>Pair + Kicker</span></div>
-        <div class="p-2.5 rounded-xl bg-felt-950/75 flex justify-between"><strong class="text-amber-300">6. High Card</strong><span>Highest single card</span></div>
+      <div class="space-y-2 text-xs text-emerald-100/95">
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">1. Trial</strong><span>Three of a Kind (A-A-A highest)</span></div>
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">2. Double Run</strong><span>Pure Sequence (A-K-Q &gt; A-2-3 &gt; K-Q-J)</span></div>
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">3. Run</strong><span>Mixed Sequence (A-K-Q &gt; A-2-3 &gt; K-Q-J)</span></div>
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">4. Color</strong><span>Flush (Same suit)</span></div>
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">5. Jut</strong><span>Pair + Kicker</span></div>
+        <div class="p-2.5 rounded-xl silk-inset flex justify-between"><strong class="text-amber-300">6. High Card</strong><span>Highest single card</span></div>
       </div>
 
       <div
         role="button"
         tabindex="0"
-        onclick="closeRulesModal()"
-        class="btn-div mt-5 w-full py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-felt-950 font-black text-sm text-center"
+        onclick="haptic(12); closeRulesModal()"
+        class="btn-div mt-5 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm text-center"
       >
         Done
       </div>
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- JAVASCRIPT P2P ENGINE, ZERO-LEAK CARD PRIVACY & SMART SETTLEMENT      -->
-  <!-- ===================================================================== -->
   <script>
     "use strict";
 
@@ -796,7 +920,14 @@
       { value: 14, label: "A" }
     ];
 
-    /* Unique per-tab identity token (protects seat ownership & host privilege) */
+    function haptic(pattern = 12) {
+      try {
+        if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+          navigator.vibrate(pattern);
+        }
+      } catch (e) {}
+    }
+
     function getClientToken() {
       try {
         let t = sessionStorage.getItem("falas_clean_token");
@@ -811,49 +942,42 @@
     }
     const CLIENT_TOKEN = getClientToken();
 
-    /* Local client P2P state */
     const client = {
-      role: null, // "host" | "guest"
+      role: null,
       roomCode: "",
       peer: null,
       hostConn: null,
-      guestConns: new Map(), // peerId -> { conn, token }
+      guestConns: new Map(),
       lobby: null,
       game: null,
       settlement: null,
-      actionPending: false, // Prevents double-click / button spamming while waiting for state sync
+      actionPending: false,
       renderCache: {
         roundNumber: -1,
         playerIdsKey: ""
       }
     };
 
-    /* Authoritative Host-Only State (Never sent raw to peers) */
     const host = {
       active: false,
       roomCode: "",
       hostToken: CLIENT_TOKEN,
       totalPlayers: 4,
       betAmount: 20,
-      players: [], // { id, name, peerId, token, isHost, net, cards, status, roundBet, handsWon }
+      players: [],
       started: false,
       settled: false,
-      phase: "lobby", // "lobby" | "playing" | "showdown" | "settled"
+      phase: "lobby",
       currentStake: 20,
       pot: 0,
       dealerIndex: 0,
       turnIndex: 0,
       roundNumber: 0,
       latestFeed: "",
-      pendingSideShow: null, // { requesterId, requesterName, targetId, targetName, fee }
+      pendingSideShow: null,
       settlementReport: null
     };
 
-    /* =====================================================================
-     * 1. CUSTOM DIV ACCESSIBILITY & HELPERS
-     * ===================================================================== */
-
-    // Enable Enter / Space activation on all custom [role="button"] divs
     document.addEventListener("keydown", e => {
       if ((e.key === "Enter" || e.key === " ") && document.activeElement?.getAttribute("role") === "button") {
         e.preventDefault();
@@ -902,9 +1026,9 @@
       const stack = document.getElementById("toastStack");
       if (!stack) return;
       const styles = {
-        info: "bg-felt-900/95 border-amber-400/45 text-amber-100",
-        good: "bg-emerald-950/95 border-emerald-400/50 text-emerald-100",
-        warn: "bg-rose-950/95 border-rose-400/50 text-rose-100"
+        info: "silk-surface border-amber-400/45 text-amber-100",
+        good: "silk-surface border-emerald-400/55 text-emerald-100",
+        warn: "silk-surface border-rose-400/55 text-rose-100"
       };
       const el = document.createElement("div");
       el.className = `px-4 py-2 rounded-2xl border shadow-xl text-xs font-bold text-center transition-all duration-300 ${styles[tone] || styles.info}`;
@@ -945,7 +1069,6 @@
         document.getElementById("bottomActionBar").classList.remove("hidden");
         roomPill.classList.remove("hidden");
         roomPill.classList.add("flex");
-        // Strictly show Stop & Settle ONLY to the initial setup creator (host)
         if (client.role === "host") {
           stopBtn.classList.remove("hidden");
         } else {
@@ -959,10 +1082,6 @@
       }
     }
 
-    /* =====================================================================
-     * 2. HOST INITIAL SETUP & LANDING JOIN CONTROLS
-     * ===================================================================== */
-
     function switchLandingMode(mode) {
       const tabCreate = document.getElementById("tabCreateTable");
       const tabJoin = document.getElementById("tabJoinTable");
@@ -970,14 +1089,14 @@
       const panelJoin = document.getElementById("landingJoinPanel");
 
       if (mode === "join") {
-        tabJoin.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 to-amber-400 text-felt-950 font-black text-xs sm:text-sm text-center shadow";
-        tabCreate.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center";
+        tabJoin.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-xs sm:text-sm text-center";
+        tabCreate.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none";
         panelCreate.classList.add("hidden");
         panelJoin.classList.remove("hidden");
         setTimeout(() => document.getElementById("landingJoinCodeInput").focus(), 40);
       } else {
-        tabCreate.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center shadow";
-        tabJoin.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center";
+        tabCreate.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center";
+        tabJoin.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none";
         panelJoin.classList.add("hidden");
         panelCreate.classList.remove("hidden");
         setTimeout(() => document.getElementById("hostNameInput").focus(), 40);
@@ -1040,10 +1159,6 @@
       host.pendingSideShow = null;
     }
 
-    /**
-     * Step 1: First person enters ONLY their name, number of players, and bet amount,
-     * then clicks "Complete Setup".
-     */
     function completeHostSetup() {
       const nameInput = document.getElementById("hostNameInput");
       const countInput = document.getElementById("playerCountInput");
@@ -1176,7 +1291,7 @@
             text: link,
             width: 98,
             height: 98,
-            colorDark: "#031610",
+            colorDark: "#02130d",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M
           });
@@ -1194,10 +1309,6 @@
         notify("Invite link copied", "good");
       } catch (e) {}
     }
-
-    /* =====================================================================
-     * 3. VISITOR CONNECTION & JOIN / LAST-PLAYER START FLOW
-     * ===================================================================== */
 
     function connectGuestToRoom(code) {
       destroyConnections();
@@ -1273,10 +1384,6 @@
       sendIntent({ type: "VISITOR_JOIN", name });
     }
 
-    /* =====================================================================
-     * 4. HOST AUTHORITATIVE HANDLER & ZERO-LEAK CARD FILTERING
-     * ===================================================================== */
-
     function sendToPeer(peerId, packet) {
       if (peerId === "HOST_LOCAL") {
         onGuestReceive(packet);
@@ -1304,11 +1411,6 @@
       };
     }
 
-    /**
-     * ZERO-LEAK SECURITY FILTER:
-     * Sends each player ONLY their own cards (and ONLY after they click "See Cards").
-     * Other players' cards are strictly [null, null, null] until Showdown.
-     */
     function buildFilteredGameSnapshot(peerId, token) {
       const isShowdown = host.phase === "showdown";
 
@@ -1387,7 +1489,6 @@
 
       switch (msg.type) {
         case "HELLO": {
-          // Reconnect check if same session tab refreshed
           const existing = host.players.find(p => p.token === token);
           if (existing) existing.peerId = senderPeerId;
 
@@ -1407,7 +1508,6 @@
         case "VISITOR_JOIN": {
           if (host.started || host.settled) return;
 
-          // If this tab already joined, just update their name
           const already = host.players.find(p => p.token === token);
           if (already) {
             already.name = String(msg.name || "").trim().slice(0, 16) || already.name;
@@ -1437,7 +1537,6 @@
             handsWon: 0
           });
 
-          // When the LAST person enters their name and clicks "Start Game", immediately start!
           if (host.players.length === host.totalPlayers) {
             host.started = true;
             host.roundNumber = 0;
@@ -1476,7 +1575,6 @@
         }
 
         case "SIDE_SHOW": {
-          // STRICT ANTI-SPAM GUARD: Ignore any duplicate Side Show click while one is pending
           if (!host.started || host.phase !== "playing" || host.pendingSideShow) return;
           const cur = host.players[host.turnIndex];
           if (!cur || (cur.token !== token && cur.peerId !== senderPeerId)) return;
@@ -1517,7 +1615,6 @@
         }
 
         case "HOST_STOP_AND_SETTLE": {
-          // STRICT SECURITY GUARD: Only the original setup creator's token can trigger settlement
           if (token !== host.hostToken || senderPeerId !== "HOST_LOCAL") return;
           if (host.settled) return;
           finalizeAndSettleGame();
@@ -1525,10 +1622,6 @@
         }
       }
     }
-
-    /* =====================================================================
-     * 5. NEPALI FALAS CARD ENGINE & LEDGER ACCOUNTING
-     * ===================================================================== */
 
     function shuffledDeck() {
       const deck = [];
@@ -1556,7 +1649,7 @@
       let seqStr = 0;
       if (r0 === 14 && r1 === 3 && r2 === 2) {
         seq = true;
-        seqStr = 13.5; // A-2-3 ranks right below A-K-Q
+        seqStr = 13.5;
       } else if (r0 - r1 === 1 && r1 - r2 === 1) {
         seq = true;
         seqStr = r0;
@@ -1598,10 +1691,10 @@
       return host.players.filter(p => p.status === "blind" || p.status === "seen");
     }
 
-    function previousActiveIndex(fromIdx) {
+    function nextActiveIndex(fromIdx) {
       const n = host.players.length;
       for (let step = 1; step < n; step++) {
-        const idx = (fromIdx - step + n) % n;
+        const idx = (fromIdx + step) % n;
         const p = host.players[idx];
         if (p.status === "blind" || p.status === "seen") return idx;
       }
@@ -1688,7 +1781,7 @@
       if (host.pendingSideShow) return;
       const rem = activePlayers();
       if (rem.length < 3) return;
-      const targetIdx = previousActiveIndex(host.turnIndex);
+      const targetIdx = nextActiveIndex(host.turnIndex);
       if (targetIdx === -1) return;
       const target = host.players[targetIdx];
       if (requester.status !== "seen" || target.status !== "seen") return;
@@ -1721,7 +1814,6 @@
       loser.status = "packed";
       host.latestFeed = `Side Show: ${winner.name} beat ${loser.name}`;
 
-      // Send private visual card comparison ONLY to Requester and Target
       sendToPeer(requester.peerId, {
         type: "SIDE_SHOW_RESULT",
         myName: requester.name,
@@ -1774,15 +1866,7 @@
       hostSyncAll();
     }
 
-    /**
-     * 100% ACCURATE SMART DEBT SETTLEMENT ALGORITHM:
-     * - Refunds any uncompleted in-progress hand bets if stopped mid-round so zero rupees are ever lost.
-     * - Verifies zero-sum ledger invariant: Sum(net) === 0.
-     * - Matches exact 1-to-1 debts first, then greedily matches largest debtor with largest creditor
-     *   for minimum transactions and 100% mathematical precision.
-     */
     function finalizeAndSettleGame() {
-      // If stopped mid-hand before Showdown, refund the uncompleted hand's bets cleanly
       if (host.phase === "playing" && host.pot > 0) {
         for (const p of host.players) {
           if (p.roundBet > 0) {
@@ -1805,7 +1889,6 @@
 
       const transfers = [];
 
-      // Pass 1: Direct exact-amount matches (minimizes split transactions)
       for (let i = 0; i < debtors.length; i++) {
         if (debtors[i].amount === 0) continue;
         const exactIdx = creditors.findIndex(c => c.amount === debtors[i].amount);
@@ -1820,7 +1903,6 @@
         }
       }
 
-      // Pass 2: Greedy max-debtor to max-creditor resolution for remaining balances
       let activeDebtors = debtors.filter(d => d.amount > 0);
       let activeCreditors = creditors.filter(c => c.amount > 0);
 
@@ -1866,10 +1948,6 @@
       hostSyncAll();
     }
 
-    /* =====================================================================
-     * 6. CLIENT MESSAGE RECEIVER & ZERO-FLICKER SMOOTH UI RENDERERS
-     * ===================================================================== */
-
     function onGuestReceive(msg) {
       if (!msg || !msg.type) return;
       client.actionPending = false;
@@ -1903,15 +1981,17 @@
         }
 
         case "SIDE_SHOW_PROMPT": {
+          haptic([20, 40, 20]);
           const me = client.game?.players?.find(p => p.isMe);
           const myHandNote = me && me.handName ? ` (Your hand: ${esc(me.handName)})` : "";
           document.getElementById("sideShowPromptText").innerHTML =
-            `<strong class="text-amber-300">${esc(msg.requesterName)}</strong> wants to compare cards with you.<span class="block text-xs text-emerald-300/80 mt-1">${myHandNote}</span>`;
+            `<strong class="text-amber-300">${esc(msg.requesterName)}</strong> wants to compare cards with you.<span class="block text-xs text-emerald-200/80 mt-1">${myHandNote}</span>`;
           document.getElementById("sideShowModal").classList.remove("hidden");
           break;
         }
 
         case "SIDE_SHOW_RESULT": {
+          haptic(msg.iWon ? [20, 30, 40] : [45, 30, 45]);
           renderSideShowResultModal(msg);
           break;
         }
@@ -1939,10 +2019,10 @@
       const btn = document.getElementById("btnVisitorJoinOrStart");
       if (isLastPerson) {
         btn.textContent = "Start Game";
-        btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 to-amber-400 text-felt-950 font-black text-base text-center shadow-xl shadow-amber-500/25";
+        btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-base text-center";
       } else {
         btn.textContent = "Join Table";
-        btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-felt-950 font-black text-base text-center shadow-xl shadow-amber-500/20";
+        btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center";
       }
     }
 
@@ -1960,16 +2040,16 @@
         if (p) {
           const isMe = p.token === CLIENT_TOKEN;
           listHtml += `
-            <div class="rounded-2xl px-3.5 py-2.5 border ${isMe ? "bg-emerald-900/50 border-emerald-400/50" : "bg-felt-950/75 border-emerald-500/20"} flex items-center justify-between">
+            <div class="rounded-2xl px-3.5 py-2.5 border ${isMe ? "bg-emerald-800/45 border-emerald-400/55 shadow-md" : "silk-inset"} flex items-center justify-between">
               <span class="font-bold text-sm text-white truncate">${esc(p.name)}</span>
               <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
             </div>
           `;
         } else {
           listHtml += `
-            <div class="rounded-2xl px-3.5 py-2.5 border border-dashed border-emerald-500/20 bg-felt-950/35 flex items-center justify-between">
-              <span class="text-xs font-semibold text-emerald-400/45">Waiting...</span>
-              <span class="w-2 h-2 rounded-full bg-amber-400/40 animate-pulse shrink-0"></span>
+            <div class="rounded-2xl px-3.5 py-2.5 border border-dashed border-emerald-400/25 bg-felt-950/35 flex items-center justify-between">
+              <span class="text-xs font-semibold text-emerald-300/45">Waiting...</span>
+              <span class="w-2 h-2 rounded-full bg-amber-400/45 animate-pulse shrink-0"></span>
             </div>
           `;
         }
@@ -2008,13 +2088,11 @@
       return `
         <div class="card-scene ${dims} shrink-0 ${dealClass}" ${dealStyle}>
           <div class="card-flipper ${hasCard ? "is-flipped" : ""}">
-            <!-- Back Face -->
             <div class="card-face card-face-back ${radius} flex items-center justify-center">
-              <div class="w-4/5 h-4/5 rounded border border-amber-300/40 flex items-center justify-center text-amber-300/80 font-display font-bold text-xs">
+              <div class="w-4/5 h-4/5 rounded border border-amber-300/45 flex items-center justify-center text-amber-300/90 font-display font-bold text-xs">
                 फ
               </div>
             </div>
-            <!-- Front Face -->
             <div class="card-face card-face-front ${radius} p-1.5 sm:p-2 flex flex-col justify-between ${hasCard ? card.color : ""}">
               ${hasCard ? renderCardFrontInner(card, size) : ""}
             </div>
@@ -2023,10 +2101,6 @@
       `;
     }
 
-    /**
-     * Smoothly updates existing card DOM nodes in-place without destroying them,
-     * eliminating card flashing, re-animation, or lag on every turn!
-     */
     function syncCardsContainer(cardsRowEl, cards, shouldBeFaceUp, size, isNewDeal) {
       const flippers = cardsRowEl.querySelectorAll(".card-flipper");
       if (flippers.length !== 3 || isNewDeal) {
@@ -2077,39 +2151,37 @@
       const me = myIndex !== -1 ? game.players[myIndex] : null;
       const activeTurnPlayer = game.players[game.turnIndex];
 
-      // 1. Update High-Clarity Turn Banner
       const heroBanner = document.getElementById("turnHeroBanner");
       const heroDot = document.getElementById("turnHeroDot");
       const heroTitle = document.getElementById("turnHeroTitle");
       const heroBadge = document.getElementById("turnHeroBadge");
 
       if (game.phase === "showdown") {
-        heroBanner.className = "rounded-2xl border px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-lg bg-amber-500/20 border-amber-400";
+        heroBanner.className = "rounded-2xl silk-surface border-amber-400/70 px-4 py-3 mb-4 flex items-center justify-between gap-3 transition-all duration-300";
         heroDot.className = "w-3 h-3 rounded-full bg-amber-400 shrink-0";
         heroTitle.textContent = game.latestFeed || "Round Complete";
         heroBadge.className = "px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-amber-400 text-felt-950";
         heroBadge.textContent = "Showdown";
       } else if (game.pendingSideShow) {
-        heroBanner.className = "rounded-2xl border px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-lg bg-purple-950/85 border-purple-400/60";
+        heroBanner.className = "rounded-2xl silk-surface border-purple-400/60 px-4 py-3 mb-4 flex items-center justify-between gap-3 transition-all duration-300";
         heroDot.className = "w-3 h-3 rounded-full bg-purple-400 shrink-0 animate-ping";
         heroTitle.textContent = `Side Show: Waiting for ${game.pendingSideShow.targetName}...`;
-        heroBadge.className = "px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-purple-500/30 text-purple-200 border border-purple-400/40";
+        heroBadge.className = "px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-purple-500/30 text-purple-200 border border-purple-400/45";
         heroBadge.textContent = "Side Show";
       } else if (me && game.turnIndex === myIndex) {
-        heroBanner.className = "rounded-2xl border-2 px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-xl bg-gradient-to-r from-amber-500/25 via-emerald-900/90 to-amber-500/20 border-amber-400";
+        heroBanner.className = "rounded-2xl silk-surface border-2 border-amber-400 px-4 py-3 mb-4 flex items-center justify-between gap-3 transition-all duration-300";
         heroDot.className = "w-3 h-3 rounded-full bg-emerald-400 shrink-0 animate-ping";
         heroTitle.textContent = "YOUR TURN — Choose your move below";
-        heroBadge.className = "px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-amber-400 text-felt-950";
+        heroBadge.className = "px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider shrink-0 bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950";
         heroBadge.textContent = "Your Move";
       } else if (activeTurnPlayer) {
-        heroBanner.className = "rounded-2xl border px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-lg bg-felt-900/90 border-emerald-500/30";
+        heroBanner.className = "rounded-2xl silk-surface px-4 py-3 mb-4 flex items-center justify-between gap-3 transition-all duration-300";
         heroDot.className = "w-3 h-3 rounded-full bg-amber-400 shrink-0 animate-pulse";
         heroTitle.textContent = `Waiting for ${activeTurnPlayer.name}...`;
-        heroBadge.className = "px-2.5 py-1 rounded-xl text-[11px] font-extrabold uppercase tracking-wider shrink-0 bg-felt-950 text-amber-300 border border-amber-400/25";
+        heroBadge.className = "px-2.5 py-1 rounded-xl text-[11px] font-extrabold uppercase tracking-wider shrink-0 silk-inset text-amber-300 border border-amber-400/30";
         heroBadge.textContent = `${activeTurnPlayer.name}'s Turn`;
       }
 
-      // 2. Render / Patch My Seat (Zero card flashing!)
       const mySeatEl = document.getElementById("mySeatCard");
       if (me) {
         const isMyTurn = game.phase === "playing" && game.turnIndex === myIndex && !game.pendingSideShow;
@@ -2118,30 +2190,30 @@
         const isPacked = me.status === "packed";
         const isFaceUp = (game.phase === "showdown" || me.status === "seen") && me.cards[0] !== null;
 
-        let cardWrapStyle = "border-amber-400/35 bg-gradient-to-br from-felt-800 to-felt-900";
-        if (isWinner) cardWrapStyle = "border-amber-400 bg-gradient-to-br from-amber-500/20 to-felt-900";
-        else if (isMyTurn) cardWrapStyle = "border-amber-400 bg-gradient-to-br from-felt-800 to-felt-900 turn-glow";
-        else if (isPacked) cardWrapStyle = "border-slate-700/70 bg-felt-950/75 opacity-75";
+        let cardWrapStyle = "silk-surface border-emerald-400/30";
+        if (isWinner) cardWrapStyle = "silk-surface border-amber-400";
+        else if (isMyTurn) cardWrapStyle = "silk-surface border-amber-400 turn-glow";
+        else if (isPacked) cardWrapStyle = "silk-inset border-slate-700/70 opacity-75";
 
         const netColor = me.net > 0 ? "text-emerald-400" : me.net < 0 ? "text-rose-400" : "text-amber-300";
 
-        let statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-800 text-amber-300 border border-amber-400/30">BLIND</span>`;
+        let statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold silk-inset text-amber-300 border border-amber-400/30">BLIND</span>`;
         if (isWinner) statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-400 text-felt-950">WINNER</span>`;
         else if (isPacked) statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-950 text-rose-300 border border-rose-500/30">PACKED</span>`;
-        else if (me.status === "seen") statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600/30 text-emerald-200 border border-emerald-400/40">SEEN</span>`;
+        else if (me.status === "seen") statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/25 text-emerald-200 border border-emerald-400/45">SEEN</span>`;
 
         const canTapCardsToSee = !isFaceUp && !isPacked && game.phase === "playing";
 
         if (!mySeatEl.querySelector("[data-my-seat-shell]") || isNewDeal) {
           mySeatEl.innerHTML = `
-            <div data-my-seat-shell="1" class="rounded-3xl border-2 p-4 sm:p-6 shadow-2xl transition-colors duration-200 ${cardWrapStyle}">
+            <div data-my-seat-shell="1" class="rounded-3xl border-2 p-4 sm:p-6 transition-all duration-300 ${cardWrapStyle}">
               <div class="flex items-center justify-between gap-2 mb-4">
                 <div class="flex items-center gap-2 min-w-0">
                   <span data-my-dealer class="${isDealer ? "" : "hidden"} w-6 h-6 rounded-full bg-amber-400 text-felt-950 font-black text-xs flex items-center justify-center shrink-0">D</span>
                   <div class="min-w-0">
                     <div class="flex items-center gap-2">
                       <h2 class="font-display text-xl sm:text-2xl font-extrabold text-white truncate">${esc(me.name)}</h2>
-                      <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">You</span>
+                      <span class="px-2 py-0.5 rounded-md bg-emerald-400/20 text-emerald-200 text-[10px] font-black uppercase border border-emerald-400/30">You</span>
                     </div>
                     <div data-my-net class="text-xs font-extrabold ${netColor}">${signedRs(me.net)}</div>
                   </div>
@@ -2152,8 +2224,8 @@
               <div class="flex flex-col items-center">
                 <div
                   data-my-cards-row
-                  ${canTapCardsToSee ? `role="button" tabindex="0" onclick="sendIntent({ type: 'SEE_CARDS' })"` : ""}
-                  class="${canTapCardsToSee ? "btn-div" : ""} flex items-center justify-center gap-3 sm:gap-4 py-1"
+                  ${canTapCardsToSee ? `role="button" tabindex="0" onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"` : ""}
+                  class="${canTapCardsToSee ? "cursor-pointer" : ""} flex items-center justify-center gap-3 sm:gap-4 py-1"
                 ></div>
                 <div data-my-hand-footer class="mt-3 min-h-[28px] flex items-center justify-center"></div>
               </div>
@@ -2161,7 +2233,7 @@
           `;
         } else {
           const shell = mySeatEl.querySelector("[data-my-seat-shell]");
-          shell.className = `rounded-3xl border-2 p-4 sm:p-6 shadow-2xl transition-colors duration-200 ${cardWrapStyle}`;
+          shell.className = `rounded-3xl border-2 p-4 sm:p-6 transition-all duration-300 ${cardWrapStyle}`;
           const dealerEl = shell.querySelector("[data-my-dealer]");
           if (dealerEl) dealerEl.classList.toggle("hidden", !isDealer);
           const netEl = shell.querySelector("[data-my-net]");
@@ -2177,13 +2249,13 @@
             if (canTapCardsToSee) {
               cardsRow.setAttribute("role", "button");
               cardsRow.setAttribute("tabindex", "0");
-              cardsRow.setAttribute("onclick", "sendIntent({ type: 'SEE_CARDS' })");
-              cardsRow.classList.add("btn-div");
+              cardsRow.setAttribute("onclick", "haptic(16); sendIntent({ type: 'SEE_CARDS' })");
+              cardsRow.classList.add("cursor-pointer");
             } else {
               cardsRow.removeAttribute("role");
               cardsRow.removeAttribute("tabindex");
               cardsRow.removeAttribute("onclick");
-              cardsRow.classList.remove("btn-div");
+              cardsRow.classList.remove("cursor-pointer");
             }
           }
         }
@@ -2195,7 +2267,7 @@
         if (myFooter) {
           if (isFaceUp && me.handName) {
             myFooter.innerHTML = `
-              <div class="px-3.5 py-1 rounded-xl bg-felt-950/90 border border-amber-400/35 text-xs font-extrabold text-amber-300">
+              <div class="px-3.5 py-1 rounded-xl silk-inset border border-amber-400/40 text-xs font-extrabold text-amber-300">
                 ${esc(me.handName)}
               </div>
             `;
@@ -2204,8 +2276,8 @@
               <div
                 role="button"
                 tabindex="0"
-                onclick="sendIntent({ type: 'SEE_CARDS' })"
-                class="btn-div px-4 py-1.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-extrabold"
+                onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
+                class="btn-div px-4 py-1.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/45 text-amber-300 text-xs font-extrabold"
               >
                 See Cards
               </div>
@@ -2218,7 +2290,6 @@
         mySeatEl.innerHTML = "";
       }
 
-      // 3. Render / Patch Opponents Grid (Persistent DOM cards per player so ZERO flashing!)
       const oppGrid = document.getElementById("opponentsGrid");
       const opponents = game.players
         .map((p, idx) => ({ p, idx }))
@@ -2226,8 +2297,8 @@
 
       if (isNewDeal || oppGrid.querySelectorAll("[data-opp-id]").length !== opponents.length) {
         oppGrid.innerHTML = opponents.map(({ p }) => `
-          <div data-opp-id="${esc(p.id)}" class="rounded-2xl border p-3 transition-colors duration-200 border-emerald-500/20 bg-felt-900/80">
-            <div data-opp-turn-strip class="hidden mb-2 px-2 py-0.5 rounded-lg bg-amber-400 text-felt-950 text-[10px] font-black uppercase tracking-wider text-center">
+          <div data-opp-id="${esc(p.id)}" class="opp-silk-card rounded-2xl border p-3 silk-surface">
+            <div data-opp-turn-strip class="hidden mb-2 px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 text-[10px] font-black uppercase tracking-wider text-center">
               Playing Now
             </div>
             <div class="flex items-start justify-between gap-1.5 mb-2">
@@ -2236,7 +2307,7 @@
                   <span data-opp-dealer class="hidden w-4 h-4 rounded-full bg-amber-400 text-felt-950 font-black text-[9px] flex items-center justify-center shrink-0">D</span>
                   <span class="font-bold text-xs sm:text-sm text-white truncate">${esc(p.name)}</span>
                 </div>
-                <div data-opp-net class="text-[11px] font-bold text-emerald-200/70"></div>
+                <div data-opp-net class="text-[11px] font-bold text-emerald-200/75"></div>
               </div>
               <div data-opp-badge class="shrink-0"></div>
             </div>
@@ -2256,12 +2327,12 @@
         const isPacked = p.status === "packed";
         const showOppCards = game.phase === "showdown" && p.cards[0] !== null;
 
-        let wrap = "border-emerald-500/20 bg-felt-900/80";
-        if (isWinner) wrap = "border-amber-400 bg-amber-500/15";
-        else if (isTurn) wrap = "border-2 border-amber-400 bg-felt-800/95 turn-glow";
-        else if (isPacked) wrap = "border-slate-700/50 bg-felt-950/55 opacity-60";
+        let wrap = "silk-surface border-emerald-400/20";
+        if (isWinner) wrap = "silk-surface border-amber-400";
+        else if (isTurn) wrap = "silk-surface border-2 border-amber-400 turn-glow";
+        else if (isPacked) wrap = "silk-inset border-slate-700/55 opacity-60";
 
-        cardEl.className = `rounded-2xl border p-3 transition-colors duration-200 ${wrap}`;
+        cardEl.className = `opp-silk-card rounded-2xl border p-3 ${wrap}`;
 
         const turnStrip = cardEl.querySelector("[data-opp-turn-strip]");
         if (turnStrip) turnStrip.classList.toggle("hidden", !isTurn);
@@ -2269,17 +2340,17 @@
         const dealerBadge = cardEl.querySelector("[data-opp-dealer]");
         if (dealerBadge) dealerBadge.classList.toggle("hidden", !isDealer);
 
-        const netClr = p.net > 0 ? "text-emerald-400" : p.net < 0 ? "text-rose-400" : "text-emerald-200/70";
+        const netClr = p.net > 0 ? "text-emerald-400" : p.net < 0 ? "text-rose-400" : "text-emerald-200/75";
         const netEl = cardEl.querySelector("[data-opp-net]");
         if (netEl) {
           netEl.className = `text-[11px] font-bold ${netClr}`;
           netEl.textContent = signedRs(p.net);
         }
 
-        let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-amber-300">BLIND</span>`;
+        let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold silk-inset text-amber-300">BLIND</span>`;
         if (isWinner) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-felt-950">WON</span>`;
         else if (isPacked) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300">PACK</span>`;
-        else if (p.status === "seen") badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600/30 text-emerald-200">SEEN</span>`;
+        else if (p.status === "seen") badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/25 text-emerald-200">SEEN</span>`;
 
         const badgeEl = cardEl.querySelector("[data-opp-badge]");
         if (badgeEl) badgeEl.innerHTML = badge;
@@ -2290,12 +2361,11 @@
         const handEl = cardEl.querySelector("[data-opp-hand]");
         if (handEl) {
           handEl.innerHTML = showOppCards && p.handName
-            ? `<span class="inline-block px-2 py-0.5 rounded-lg bg-felt-950/90 text-[10px] font-bold text-amber-300">${esc(p.handName)}</span>`
+            ? `<span class="inline-block px-2 py-0.5 rounded-lg silk-inset text-[10px] font-bold text-amber-300">${esc(p.handName)}</span>`
             : "";
         }
       });
 
-      // 4. Render Docked Action Bar
       renderBottomActionBarOnly();
     }
 
@@ -2312,8 +2382,8 @@
           <div
             role="button"
             tabindex="0"
-            onclick="sendIntent({ type: 'NEXT_ROUND' })"
-            class="btn-div px-7 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-felt-950 font-black text-sm shadow-lg"
+            onclick="haptic(16); sendIntent({ type: 'NEXT_ROUND' })"
+            class="btn-div px-7 py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm"
           >
             Next Round →
           </div>
@@ -2321,7 +2391,6 @@
         return;
       }
 
-      // Lock action controls while a Side Show is awaiting response so nobody can spam buttons
       if (game.pendingSideShow) {
         const amTarget = me && game.pendingSideShow.targetId === me.id;
         if (amTarget) {
@@ -2330,16 +2399,16 @@
             <div
               role="button"
               tabindex="0"
-              onclick="answerSideShow(false)"
-              class="btn-div px-4 py-2.5 rounded-xl bg-rose-800 hover:bg-rose-700 text-white font-extrabold text-xs"
+              onclick="haptic(14); answerSideShow(false)"
+              class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-800 to-rose-700 text-white font-extrabold text-xs"
             >
               Decline
             </div>
             <div
               role="button"
               tabindex="0"
-              onclick="answerSideShow(true)"
-              class="btn-div px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-felt-950 font-black text-xs"
+              onclick="haptic(18); answerSideShow(true)"
+              class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-black text-xs"
             >
               Compare Cards
             </div>
@@ -2360,7 +2429,7 @@
 
       if (!me || game.turnIndex !== myIndex) {
         bar.innerHTML = `
-          <div class="flex items-center gap-2 py-1 text-xs sm:text-sm font-semibold text-emerald-200">
+          <div class="flex items-center gap-2 py-1 text-xs sm:text-sm font-semibold text-emerald-100">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
             <span>Waiting for <strong class="text-amber-300">${esc(activeTurn.name)}</strong></span>
           </div>
@@ -2368,8 +2437,8 @@
             <div
               role="button"
               tabindex="0"
-              onclick="sendIntent({ type: 'SEE_CARDS' })"
-              class="btn-div ml-2 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs"
+              onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
+              class="btn-div ml-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-bold text-xs"
             >
               See Cards
             </div>
@@ -2378,19 +2447,18 @@
         return;
       }
 
-      // It IS my turn
       const activeList = game.players.filter(p => p.status === "blind" || p.status === "seen");
       const isBlind = me.status === "blind";
       const callAmt = isBlind ? game.currentStake : game.currentStake * 2;
       const raiseAmt = callAmt * 2;
 
-      let prevActive = null;
+      let nextActive = null;
       const total = game.players.length;
       for (let step = 1; step < total; step++) {
-        const idx = (myIndex - step + total) % total;
+        const idx = (myIndex + step) % total;
         const cand = game.players[idx];
         if (cand.status === "blind" || cand.status === "seen") {
-          prevActive = cand;
+          nextActive = cand;
           break;
         }
       }
@@ -2398,8 +2466,8 @@
       const canSideShow =
         activeList.length >= 3 &&
         me.status === "seen" &&
-        prevActive &&
-        prevActive.status === "seen";
+        nextActive &&
+        nextActive.status === "seen";
 
       const canShow = activeList.length === 2;
 
@@ -2408,8 +2476,8 @@
           <div
             role="button"
             tabindex="0"
-            onclick="sendIntent({ type: 'SEE_CARDS' })"
-            class="btn-div px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs sm:text-sm shadow"
+            onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
+            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold text-xs sm:text-sm"
           >
             See Cards
           </div>
@@ -2418,8 +2486,8 @@
         <div
           role="button"
           tabindex="0"
-          onclick="sendIntent({ type: 'BET', mult: 1 })"
-          class="btn-div px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm shadow-lg"
+          onclick="haptic(14); sendIntent({ type: 'BET', mult: 1 })"
+          class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-xs sm:text-sm"
         >
           ${isBlind ? "Blind" : "Chaal"} ${rs(callAmt)}
         </div>
@@ -2427,8 +2495,8 @@
         <div
           role="button"
           tabindex="0"
-          onclick="sendIntent({ type: 'BET', mult: 2 })"
-          class="btn-div px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-felt-950 font-extrabold text-xs sm:text-sm shadow"
+          onclick="haptic(18); sendIntent({ type: 'BET', mult: 2 })"
+          class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-felt-950 font-extrabold text-xs sm:text-sm"
         >
           2× ${rs(raiseAmt)}
         </div>
@@ -2437,8 +2505,8 @@
           <div
             role="button"
             tabindex="0"
-            onclick="sendIntent({ type: 'SIDE_SHOW' })"
-            class="btn-div px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs sm:text-sm shadow"
+            onclick="haptic(18); sendIntent({ type: 'SIDE_SHOW' })"
+            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-xs sm:text-sm"
           >
             Side Show (${rs(callAmt)})
           </div>
@@ -2448,8 +2516,8 @@
           <div
             role="button"
             tabindex="0"
-            onclick="sendIntent({ type: 'SHOW' })"
-            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-black text-xs sm:text-sm shadow-lg"
+            onclick="haptic(22); sendIntent({ type: 'SHOW' })"
+            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm"
           >
             Show ${rs(callAmt)}
           </div>
@@ -2458,8 +2526,8 @@
         <div
           role="button"
           tabindex="0"
-          onclick="sendIntent({ type: 'PACK' })"
-          class="btn-div px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-xs sm:text-sm shadow"
+          onclick="haptic(12); sendIntent({ type: 'PACK' })"
+          class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 to-rose-600 text-white font-extrabold text-xs sm:text-sm"
         >
           Pack
         </div>
@@ -2479,19 +2547,19 @@
       const theirBadge = document.getElementById("ssTheirOutcomeBadge");
 
       if (data.iWon) {
-        myBox.className = "rounded-2xl border-2 border-emerald-400 p-4 bg-emerald-950/40";
+        myBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset";
         myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950";
         myBadge.textContent = "YOU WON";
 
-        theirBox.className = "rounded-2xl border-2 border-rose-500/45 p-4 bg-rose-950/25 opacity-85";
+        theirBox.className = "rounded-2xl border-2 border-rose-500/45 p-4 silk-inset opacity-85";
         theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200";
         theirBadge.textContent = "PACKED";
       } else {
-        myBox.className = "rounded-2xl border-2 border-rose-500/55 p-4 bg-rose-950/30 opacity-90";
+        myBox.className = "rounded-2xl border-2 border-rose-500/55 p-4 silk-inset opacity-90";
         myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200";
         myBadge.textContent = "YOU PACKED";
 
-        theirBox.className = "rounded-2xl border-2 border-emerald-400 p-4 bg-emerald-950/40";
+        theirBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset";
         theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950";
         theirBadge.textContent = "WON";
       }
@@ -2515,9 +2583,10 @@
       document.getElementById("sideShowResultModal").classList.add("hidden");
     }
 
-    /* =====================================================================
-     * 7. HOST SECURE STOP & SETTLE + FINAL SETTLEMENT RENDERER
-     * ===================================================================== */
+    function answerSideShow(accept) {
+      document.getElementById("sideShowModal").classList.add("hidden");
+      sendIntent({ type: "SIDE_SHOW_ANSWER", accept });
+    }
 
     function openSettleConfirmModal() {
       if (client.role !== "host") return;
@@ -2550,19 +2619,19 @@
       const transfersBox = document.getElementById("settlementTransfersList");
       if (!report.transfers || report.transfers.length === 0) {
         transfersBox.innerHTML = `
-          <div class="rounded-2xl bg-felt-950/80 border border-emerald-500/25 p-5 text-center text-sm font-bold text-emerald-200">
+          <div class="rounded-2xl silk-inset p-5 text-center text-sm font-bold text-emerald-200">
             Everyone broke even! No payments needed.
           </div>
         `;
       } else {
         transfersBox.innerHTML = report.transfers.map(t => `
-          <div class="rounded-2xl bg-felt-950/90 border border-amber-400/35 p-4 flex items-center justify-between gap-3 shadow-md">
+          <div class="rounded-2xl silk-inset border-amber-400/35 p-4 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2 sm:gap-3 min-w-0">
               <span class="font-extrabold text-sm sm:text-base text-rose-300 truncate">${esc(t.fromName)}</span>
-              <span class="text-xs font-bold text-emerald-400/70 shrink-0">pays →</span>
+              <span class="text-xs font-bold text-emerald-300/75 shrink-0">pays →</span>
               <span class="font-extrabold text-sm sm:text-base text-emerald-300 truncate">${esc(t.toName)}</span>
             </div>
-            <span class="px-3 py-1 rounded-xl bg-amber-400 text-felt-950 font-black text-sm sm:text-base shrink-0">
+            <span class="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-black text-sm sm:text-base shrink-0">
               ${rs(t.amount)}
             </span>
           </div>
@@ -2573,10 +2642,10 @@
       standingsBox.innerHTML = report.standings.map(s => {
         const clr = s.net > 0 ? "text-emerald-400" : s.net < 0 ? "text-rose-400" : "text-slate-300";
         return `
-          <div class="rounded-xl bg-felt-950/60 border border-emerald-500/15 px-3.5 py-2.5 flex items-center justify-between">
+          <div class="rounded-xl silk-inset px-3.5 py-2.5 flex items-center justify-between">
             <div>
               <span class="font-bold text-sm text-white">${esc(s.name)}</span>
-              <span class="text-[11px] text-emerald-300/60 ml-2">${s.handsWon} won</span>
+              <span class="text-[11px] text-emerald-200/65 ml-2">${s.handsWon} won</span>
             </div>
             <span class="font-black text-sm ${clr}">${signedRs(s.net)}</span>
           </div>
@@ -2595,11 +2664,6 @@
       switchLandingMode("create");
     }
 
-    function answerSideShow(accept) {
-      document.getElementById("sideShowModal").classList.add("hidden");
-      sendIntent({ type: "SIDE_SHOW_ANSWER", accept });
-    }
-
     function openRulesModal() {
       document.getElementById("rulesModal").classList.remove("hidden");
     }
@@ -2608,9 +2672,6 @@
       document.getElementById("rulesModal").classList.add("hidden");
     }
 
-    /* =====================================================================
-     * 8. ENTRY POINT (Auto-route Visitors if ?room= is present)
-     * ===================================================================== */
     window.addEventListener("DOMContentLoaded", () => {
       try {
         const params = new URLSearchParams(window.location.search);
