@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <title>फलास</title>
-    <meta name="description" content="फलास (Falas) — Real-time peer-to-peer multiplayer Nepali card game. Play Blind, Chaal, Side Show, Trial, Double Run, and Jut with friends with instant zero-leak card privacy and automatic settlement." />
+    <meta name="description" content="फलास (Falas) — Real-time peer-to-peer multiplayer Nepali card game. Play Blind, Chaal, Side Show, Trial, Double Run, and Jut with friends or smart bots with zero-leak card privacy, live Hisab ledger, and automatic settlement." />
     <meta name="keywords" content="फलास, Falas, Falas card game, Nepali card game, Nepali Falas online, Teen Patti Nepal, P2P card game, Trial, Double Run, Jut, multiplayer card game" />
     <meta name="author" content="फलास" />
     <meta name="theme-color" content="#031b13" />
@@ -253,7 +253,7 @@
         transform-style: preserve-3d;
         -webkit-transform-style: preserve-3d;
         will-change: transform;
-        transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .card-flipper.is-flipped {
@@ -303,6 +303,22 @@
         animation: cardDeal 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
       }
 
+      @keyframes squeezePulse {
+        0% {
+          transform: scale(1);
+        }
+        45% {
+          transform: scale(1.09);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .animate-squeeze-reveal {
+        animation: squeezePulse 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
       @keyframes fadeSlideUp {
         from {
           opacity: 0;
@@ -331,6 +347,50 @@
 
       .animate-modal {
         animation: modalSpring 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes drawerSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .animate-drawer {
+        animation: drawerSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes floatSeatDelta {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 8px) scale(0.82);
+        }
+        16% {
+          opacity: 1;
+          transform: translate(-50%, -4px) scale(1.06);
+        }
+        75% {
+          opacity: 1;
+          transform: translate(-50%, -26px) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -42px) scale(0.94);
+        }
+      }
+
+      .seat-delta-popup {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        z-index: 30;
+        pointer-events: none;
+        white-space: nowrap;
+        animation: floatSeatDelta 2.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
 
       @keyframes pulseTurn {
@@ -561,6 +621,9 @@
     </style>
   </head>
   <body class="antialiased selection:bg-amber-400 selection:text-felt-950 pb-32 relative">
+    <!-- Flying Chip Animation Layer -->
+    <div id="flyingChipLayer" class="fixed inset-0 pointer-events-none z-40 overflow-hidden"></div>
+
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-30 silk-bar border-b border-emerald-400/20 px-4 sm:px-6 py-3">
       <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
@@ -577,6 +640,14 @@
             <span id="headerConnDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span id="headerRoomCode" class="font-black tracking-widest text-amber-300">----</span>
           </div>
+
+          <!-- Header Hisab Drawer Button (Quick Access on Both Mobile & Desktop) -->
+          <div id="btnHeaderHisab" role="button" tabindex="0" onclick="haptic(12); SoundFX.unlock(); openHisabDrawer()" class="hidden btn-div px-3 py-1.5 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 text-xs font-extrabold flex items-center gap-1.5">
+            <span>📒</span>
+            <span>Hisab</span>
+            <span id="headerHisabCountBadge" class="px-1.5 py-0.2 rounded-md bg-amber-400/20 text-amber-200 text-[10px] font-black">0</span>
+          </div>
+
           <div id="headerMenuToggle" role="button" tabindex="0" aria-label="Open menu" aria-controls="headerMenu" aria-expanded="false" onclick="haptic(10); toggleHeaderMenu()" class="btn-div w-11 h-11 rounded-xl silk-inset text-amber-300 flex items-center justify-center">
             <span class="header-menu-icon" aria-hidden="true">
               <span></span>
@@ -589,9 +660,13 @@
               <span class="w-2 h-2 rounded-full bg-rose-400"></span>
               <span>Stop &amp; Settle</span>
             </div>
+            <div id="btnSoundToggle" role="button" tabindex="0" onclick="haptic(10); SoundFX.toggleMute()" aria-label="Toggle Sound" class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 font-extrabold text-sm flex items-center justify-center">
+              <span id="soundToggleIcon" aria-hidden="true">🔊</span>
+              <span id="soundToggleLabel" class="header-menu-label" aria-hidden="true">Sound On</span>
+            </div>
             <div role="button" tabindex="0" onclick="haptic(10); closeHeaderMenu(); openRulesModal()" aria-label="Rules" class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 font-extrabold text-sm flex items-center justify-center">
               <span aria-hidden="true">?</span>
-              <span class="header-menu-label" aria-hidden="true">Hand Rankings</span>
+              <span class="header-menu-label" aria-hidden="true">Hand Rankings &amp; Options</span>
             </div>
           </div>
         </div>
@@ -616,9 +691,9 @@
     <!-- Toast Notifications -->
     <div id="toastStack" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-full max-w-sm px-4"></div>
 
-    <!-- Screen 1: Host Setup & Landing -->
+    <!-- Screen 1: Host Setup, Join & Solo Practice -->
     <section id="hostSetupScreen" class="relative z-10 max-w-md mx-auto px-4 pt-7 sm:pt-11 animate-view">
-      <!-- Host Resume Active Session Banner (shown if localStorage backup exists) -->
+      <!-- Host Resume Active Session Banner -->
       <div id="hostResumeBanner" class="hidden mb-4 rounded-3xl silk-surface border-2 border-amber-400/65 p-4 sm:p-5 animate-view">
         <div class="flex items-start justify-between gap-3 mb-3">
           <div>
@@ -636,18 +711,21 @@
             ✕
           </div>
         </div>
-        <div role="button" tabindex="0" onclick="haptic(18); resumeSavedHostTable()" class="btn-div w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-sm text-center">
+        <div role="button" tabindex="0" onclick="haptic(18); SoundFX.unlock(); resumeSavedHostTable()" class="btn-div w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-sm text-center">
           Resume Hosted Table →
         </div>
       </div>
 
       <div class="rounded-3xl silk-surface p-5 sm:p-7">
-        <div class="grid grid-cols-2 gap-2 p-1.5 rounded-2xl silk-inset mb-6">
-          <div id="tabCreateTable" role="button" tabindex="0" onclick="haptic(12); switchLandingMode('create')" class="btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center">
+        <div class="grid grid-cols-3 gap-1.5 p-1.5 rounded-2xl silk-inset mb-6">
+          <div id="tabCreateTable" role="button" tabindex="0" onclick="haptic(12); switchLandingMode('create')" class="btn-div py-2.5 px-2 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs text-center">
             New Table
           </div>
-          <div id="tabJoinTable" role="button" tabindex="0" onclick="haptic(12); switchLandingMode('join')" class="btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none">
-            Join Existing Table
+          <div id="tabJoinTable" role="button" tabindex="0" onclick="haptic(12); switchLandingMode('join')" class="btn-div py-2.5 px-2 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs text-center shadow-none">
+            Join Table
+          </div>
+          <div id="tabSoloBots" role="button" tabindex="0" onclick="haptic(12); switchLandingMode('solo')" class="btn-div py-2.5 px-2 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs text-center shadow-none">
+            Practice Solo
           </div>
         </div>
 
@@ -678,7 +756,7 @@
 
           <div>
             <label for="betAmountInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-200/85 mb-1.5">
-              Bet Amount
+              Blind Bet (Chaal = 2×)
             </label>
             <div class="relative mb-2">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-extrabold text-amber-400">Rs.</span>
@@ -722,7 +800,7 @@
             </div>
           </div>
 
-          <div id="btnCompleteSetup" role="button" tabindex="0" onclick="haptic(18); completeHostSetup()" class="btn-div mt-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center">
+          <div id="btnCompleteSetup" role="button" tabindex="0" onclick="haptic(18); SoundFX.unlock(); completeHostSetup()" class="btn-div mt-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center">
             Complete Setup
           </div>
         </div>
@@ -746,14 +824,81 @@
             </label>
             <input id="landingJoinCodeInput" type="text" maxlength="6" placeholder="ABCD" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" onkeydown="if (event.key === 'Enter') connectFromLandingJoin()" class="w-full silk-input rounded-2xl px-4 py-3.5 text-center tracking-[0.28em] uppercase text-2xl font-black text-amber-300 placeholder-emerald-400/30 focus:outline-none" />
           </div>
-          <div id="btnLandingConnect" role="button" tabindex="0" onclick="haptic(18); connectFromLandingJoin()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-base text-center">
+          <div id="btnLandingConnect" role="button" tabindex="0" onclick="haptic(18); SoundFX.unlock(); connectFromLandingJoin()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-base text-center">
             Find Table →
+          </div>
+        </div>
+
+        <!-- Solo Practice vs Smart Bots Panel -->
+        <div id="landingSoloPanel" class="hidden space-y-4">
+          <div class="rounded-2xl silk-inset p-4 text-center">
+            <div class="w-11 h-11 rounded-2xl bg-amber-400/15 border border-amber-400/35 text-amber-300 flex items-center justify-center mx-auto mb-2 text-lg font-black shadow-inner">
+              🤖
+            </div>
+            <h2 class="font-display text-xl font-extrabold text-white">
+              Practice vs Smart Bots
+            </h2>
+            <p class="text-xs text-emerald-200/75 mt-1">
+              Instant offline Classic Falas against AI opponents
+            </p>
+          </div>
+
+          <div>
+            <label for="soloNameInput" class="block text-xs font-bold uppercase tracking-wider text-emerald-200/85 mb-1.5">
+              Your Name
+            </label>
+            <input id="soloNameInput" type="text" maxlength="16" value="You" placeholder="Enter your name" onkeydown="if (event.key === 'Enter') startSoloBotGame()" class="w-full silk-input rounded-2xl px-4 py-3 text-base font-bold text-white placeholder-emerald-400/35 focus:outline-none" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-200/85">AI Opponents</span>
+              <span id="soloBotCountLabel" class="text-[11px] font-bold text-amber-300">3 Bots (4-Seat Table)</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <div data-bot-count="2" role="button" tabindex="0" onclick="haptic(8); setSoloBotCount(2)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                2 Bots
+              </div>
+              <div data-bot-count="3" role="button" tabindex="0" onclick="haptic(8); setSoloBotCount(3)" class="btn-div py-2 rounded-xl bg-amber-400/20 border border-amber-400/60 text-center text-xs font-black text-amber-300">
+                3 Bots
+              </div>
+              <div data-bot-count="4" role="button" tabindex="0" onclick="haptic(8); setSoloBotCount(4)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                4 Bots
+              </div>
+              <div data-bot-count="5" role="button" tabindex="0" onclick="haptic(8); setSoloBotCount(5)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                5 Bots
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-200/85">Blind Bet (Chaal = 2×)</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <div data-solo-bet="10" role="button" tabindex="0" onclick="haptic(8); setSoloBetAmount(10)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                Rs. 10
+              </div>
+              <div data-solo-bet="20" role="button" tabindex="0" onclick="haptic(8); setSoloBetAmount(20)" class="btn-div py-2 rounded-xl bg-amber-400/20 border border-amber-400/60 text-center text-xs font-black text-amber-300">
+                Rs. 20
+              </div>
+              <div data-solo-bet="50" role="button" tabindex="0" onclick="haptic(8); setSoloBetAmount(50)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                Rs. 50
+              </div>
+              <div data-solo-bet="100" role="button" tabindex="0" onclick="haptic(8); setSoloBetAmount(100)" class="btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100">
+                Rs. 100
+              </div>
+            </div>
+          </div>
+
+          <div role="button" tabindex="0" onclick="haptic(18); SoundFX.unlock(); startSoloBotGame()" class="btn-div mt-2 w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-base text-center">
+            Start Solo Practice →
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Screen 2: Visitor Name Prompt -->
+    <!-- Screen 2: Visitor / Spectator Name Prompt -->
     <section id="visitorJoinScreen" class="hidden relative z-10 max-w-md mx-auto px-4 pt-8 sm:pt-12 animate-view">
       <div class="rounded-3xl silk-surface p-6 sm:p-8 text-center">
         <div id="visitorSeatProgressBadge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/35 text-amber-300 text-xs font-extrabold mb-3">
@@ -769,7 +914,7 @@
           <div>
             <input id="visitorNameInput" type="text" maxlength="16" placeholder="Your name" onkeydown="if (event.key === 'Enter') submitVisitorName()" class="w-full silk-input rounded-2xl px-4 py-3.5 text-center text-lg font-bold text-white placeholder-emerald-400/35 focus:outline-none" />
           </div>
-          <div id="btnVisitorJoinOrStart" role="button" tabindex="0" onclick="haptic(20); submitVisitorName()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center">
+          <div id="btnVisitorJoinOrStart" role="button" tabindex="0" onclick="haptic(20); SoundFX.unlock(); submitVisitorName()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center">
             Join Table
           </div>
           <div class="pt-2 text-center">
@@ -792,7 +937,7 @@
             </h2>
           </div>
           <div class="text-right">
-            <span class="text-[11px] uppercase tracking-wider text-emerald-200/75 block">Bet • Timer</span>
+            <span class="text-[11px] uppercase tracking-wider text-emerald-200/75 block">Blind • Timer</span>
             <span id="lobbyBetLabel" class="text-base font-black text-amber-300">Rs. 20 • 25s</span>
           </div>
         </div>
@@ -801,7 +946,7 @@
 
         <!-- Host Early Start & Seat Controls -->
         <div id="hostLobbyControls" class="hidden mb-5 space-y-2.5">
-          <div id="btnHostStartEarly" role="button" tabindex="0" onclick="haptic(20); hostStartGameEarly()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-sm sm:text-base text-center">
+          <div id="btnHostStartEarly" role="button" tabindex="0" onclick="haptic(20); SoundFX.unlock(); hostStartGameEarly()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-sm sm:text-base text-center">
             Start Game Now
           </div>
           <div class="flex items-center justify-between px-3 py-2 rounded-2xl silk-inset text-xs">
@@ -827,7 +972,10 @@
             </div>
             <div class="flex items-center gap-2">
               <input id="lobbyShareInput" type="text" readonly="" class="flex-1 min-w-0 silk-input rounded-xl px-3 py-2 text-xs text-emerald-100 select-all focus:outline-none" />
-              <div role="button" tabindex="0" onclick="haptic(14); copyShareUrl()" class="btn-div px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-extrabold text-xs shrink-0">
+              <div role="button" tabindex="0" onclick="haptic(14); shareOrCopyInvite()" class="btn-div px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-300 text-felt-950 font-black text-xs shrink-0">
+                Share
+              </div>
+              <div role="button" tabindex="0" onclick="haptic(12); copyShareUrl()" class="btn-div px-3 py-2 rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-extrabold text-xs shrink-0">
                 Copy
               </div>
             </div>
@@ -846,6 +994,9 @@
             <span id="turnHeroTitle" class="font-extrabold text-sm sm:text-base text-white truncate">Waiting...</span>
           </div>
           <div class="flex items-center gap-2 shrink-0">
+            <span id="spectatorCountPill" class="hidden px-2.5 py-1 rounded-xl text-[11px] font-extrabold bg-sky-500/20 text-sky-200 border border-sky-400/40">
+              👁 1
+            </span>
             <span id="turnTimerBadge" class="hidden px-2.5 py-1 rounded-xl text-xs font-black tabular-nums bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">
               25s
             </span>
@@ -861,11 +1012,11 @@
       </div>
 
       <!-- Center Felt Pot & Stakes Panel -->
-      <div class="felt-panel rounded-3xl border border-emerald-400/25 px-4 py-3.5 sm:px-6 sm:py-4 mb-5">
+      <div id="centerPotPanel" class="felt-panel rounded-3xl border border-emerald-400/25 px-4 py-3.5 sm:px-6 sm:py-4 mb-5 transition-transform duration-200">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
             <span class="text-[10px] uppercase tracking-widest font-bold text-amber-300/85 block">Pot</span>
-            <span id="potValue" class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight drop-shadow">Rs. 0</span>
+            <span id="potValue" class="inline-block text-2xl sm:text-3xl font-black text-amber-400 tracking-tight drop-shadow transition-transform duration-200">Rs. 0</span>
           </div>
           <div class="flex items-center gap-4 sm:gap-6">
             <div class="text-right">
@@ -884,8 +1035,8 @@
         </div>
       </div>
 
-      <!-- Local Player Seat -->
-      <div id="mySeatCard" class="mb-5"></div>
+      <!-- Local Player Seat (or Spectator Status Banner) -->
+      <div id="mySeatCard" class="mb-5 relative"></div>
 
       <!-- Opponents Grid -->
       <div id="opponentsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4"></div>
@@ -928,31 +1079,69 @@
       <div id="bottomActionContent" class="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-3"></div>
     </footer>
 
-    <!-- Side Show Result Modal -->
+    <!-- Round-by-Round Hisab Audit Drawer -->
+    <div id="hisabDrawerOverlay" onclick="if (event.target === this) closeHisabDrawer()" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end">
+      <div class="w-full max-w-md h-full silk-surface border-l border-amber-400/35 flex flex-col animate-drawer">
+        <div class="px-5 py-4 border-b border-emerald-400/20 flex items-center justify-between gap-3 shrink-0">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 block">Live Audit Ledger</span>
+            <h3 class="font-display text-xl font-extrabold text-white">Round-by-Round Hisab</h3>
+          </div>
+          <div role="button" tabindex="0" onclick="haptic(10); closeHisabDrawer()" aria-label="Close Hisab" class="btn-div w-9 h-9 rounded-xl silk-inset text-emerald-200 flex items-center justify-center text-sm font-bold">
+            ✕
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-5">
+          <!-- Current Running Standings -->
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-200/75 block mb-2.5">Current Table Standings</span>
+            <div id="hisabStandingsList" class="space-y-1.5"></div>
+          </div>
+
+          <!-- Completed Rounds History Cards (Round #, Pot, Winner & Winning Hand only) -->
+          <div class="border-t border-emerald-400/15 pt-4">
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-200/75">Completed Hands</span>
+              <span id="hisabRoundTotalBadge" class="text-[11px] font-extrabold text-amber-300">0 Rounds</span>
+            </div>
+            <div id="hisabRoundsList" class="space-y-2.5"></div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-emerald-400/20 shrink-0">
+          <div role="button" tabindex="0" onclick="haptic(10); closeHisabDrawer()" class="btn-div w-full py-3 rounded-2xl silk-inset text-emerald-100 font-bold text-sm text-center">
+            Back to Table
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Show Result Modal (With Dramatic Card-by-Card Squeeze Reveal) -->
     <div id="sideShowResultModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
       <div class="w-full max-w-lg rounded-3xl silk-surface border-2 border-amber-400/50 p-5 sm:p-7 text-center animate-modal">
         <span class="inline-block px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/45 text-purple-200 text-xs font-extrabold uppercase tracking-wider mb-2">
           Side Show Result
         </span>
         <h3 id="sideShowResultHeadline" class="font-display text-xl sm:text-2xl font-extrabold text-white mb-5">
-          Card Comparison
+          Revealing Cards...
         </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div id="ssMyBox" class="rounded-2xl border-2 p-4 silk-inset">
+          <div id="ssMyBox" class="rounded-2xl border-2 p-4 silk-inset transition-all duration-300">
             <div class="flex items-center justify-between gap-2 mb-2.5">
               <span class="text-xs font-black uppercase tracking-wider text-amber-300">Your Cards</span>
-              <span id="ssMyOutcomeBadge" class="px-2 py-0.5 rounded-full text-[10px] font-black">WON</span>
+              <span id="ssMyOutcomeBadge" class="opacity-0 transition-opacity duration-300 px-2 py-0.5 rounded-full text-[10px] font-black">WON</span>
             </div>
             <div id="ssMyCardsRow" class="flex items-center justify-center gap-2 py-1"></div>
-            <div id="ssMyHandLabel" class="mt-2.5 text-xs font-extrabold text-white"></div>
+            <div id="ssMyHandLabel" class="opacity-0 transition-opacity duration-300 mt-2.5 text-xs font-extrabold text-white"></div>
           </div>
-          <div id="ssTheirBox" class="rounded-2xl border-2 p-4 silk-inset">
+          <div id="ssTheirBox" class="rounded-2xl border-2 p-4 silk-inset transition-all duration-300">
             <div class="flex items-center justify-between gap-2 mb-2.5">
               <span id="ssTheirTitle" class="text-xs font-black uppercase tracking-wider text-sky-300 truncate">Opponent's Cards</span>
-              <span id="ssTheirOutcomeBadge" class="px-2 py-0.5 rounded-full text-[10px] font-black">LOST</span>
+              <span id="ssTheirOutcomeBadge" class="opacity-0 transition-opacity duration-300 px-2 py-0.5 rounded-full text-[10px] font-black">LOST</span>
             </div>
             <div id="ssTheirCardsRow" class="flex items-center justify-center gap-2 py-1"></div>
-            <div id="ssTheirHandLabel" class="mt-2.5 text-xs font-extrabold text-white"></div>
+            <div id="ssTheirHandLabel" class="opacity-0 transition-opacity duration-300 mt-2.5 text-xs font-extrabold text-white"></div>
           </div>
         </div>
         <div role="button" tabindex="0" onclick="haptic(12); closeSideShowResultModal()" class="btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm">
@@ -1013,12 +1202,12 @@
       </div>
     </div>
 
-    <!-- Hand Rankings Modal -->
+    <!-- Hand Rankings & Table Preferences Modal -->
     <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
       <div class="w-full max-w-md rounded-3xl silk-surface border border-amber-400/40 p-6 animate-modal">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-display text-xl font-extrabold text-white">
-            फलास Hand Rankings
+            फलास Rules &amp; Preferences
           </h3>
           <div role="button" tabindex="0" onclick="haptic(10); closeRulesModal()" aria-label="Close" class="btn-div w-8 h-8 rounded-xl silk-inset text-emerald-200 flex items-center justify-center text-sm font-bold">
             ✕
@@ -1049,7 +1238,22 @@
             <strong class="text-amber-300">6. High Card</strong>
             <span>Highest single card</span>
           </div>
+          <div class="p-2.5 rounded-xl silk-inset text-[11px] text-emerald-200/85">
+            <strong class="text-amber-300">Betting &amp; Show:</strong> Blind bets equal the set table stake; Chaal &amp; Side Show equal 2× Blind. Final Show is only allowed when 2 active players remain (Blind calls Show at Blind amount; Seen calls Show at Chaal amount). Exact ties go to the defender.
+          </div>
         </div>
+
+        <!-- Hand Strength Hint Toggle -->
+        <div class="mt-4 pt-3.5 border-t border-emerald-400/20 flex items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-extrabold text-white block">Hand Strength Hint Pill</span>
+            <span class="text-[11px] text-emerald-200/70">Show tier badge beneath your seen cards</span>
+          </div>
+          <div id="btnToggleHandHint" role="button" tabindex="0" onclick="haptic(10); toggleHandHintSetting()" class="btn-div px-3.5 py-2 rounded-xl bg-emerald-500/25 border border-emerald-400/50 text-emerald-200 font-black text-xs">
+            ON
+          </div>
+        </div>
+
         <div role="button" tabindex="0" onclick="haptic(12); closeRulesModal()" class="btn-div mt-5 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-sm text-center">
           Done
         </div>
@@ -1060,10 +1264,12 @@
       "use strict";
 
       const PEER_NS = "falas-minimal-p2p-";
-      const HOST_BACKUP_KEY = "falas_host_backup_v1";
-      const GUEST_ROOM_KEY = "falas_guest_room_v1";
+      const HOST_BACKUP_KEY = "falas_host_backup_v2";
+      const GUEST_ROOM_KEY = "falas_guest_room_v2";
       const TOKEN_STORAGE_KEY = "falas_durable_token_v1";
-      const BACKUP_MAX_AGE_MS = 4 * 60 * 60 * 1000; // 4 hours
+      const SOUND_MUTE_KEY = "falas_sound_muted_v1";
+      const HAND_HINT_KEY = "falas_hand_hint_v1";
+      const BACKUP_MAX_AGE_MS = 4 * 60 * 60 * 1000;
 
       const PEER_ICE_CONFIG = {
         iceServers: [
@@ -1096,6 +1302,14 @@
         { value: 14, label: "A" }
       ];
 
+      const BOT_PROFILES = [
+        { name: "Aarav", style: "balanced" },
+        { name: "Priya", style: "cautious" },
+        { name: "Bikash", style: "daredevil" },
+        { name: "Sita", style: "balanced" },
+        { name: "Rohan", style: "cautious" }
+      ];
+
       function haptic(pattern = 12) {
         try {
           if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
@@ -1104,7 +1318,174 @@
         } catch (e) {}
       }
 
-      /* Durable player identity across tab reloads and mobile backgrounding */
+      /* Zero-Asset Web Audio Sound Synthesizer */
+      const SoundFX = {
+        ctx: null,
+        muted: false,
+
+        init() {
+          try {
+            this.muted = localStorage.getItem(SOUND_MUTE_KEY) === "1";
+          } catch (e) {}
+          this.syncToggleUI();
+        },
+
+        unlock() {
+          try {
+            if (!this.ctx) {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              if (AudioCtx) this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === "suspended") {
+              this.ctx.resume();
+            }
+          } catch (e) {}
+        },
+
+        toggleMute() {
+          this.muted = !this.muted;
+          try {
+            localStorage.setItem(SOUND_MUTE_KEY, this.muted ? "1" : "0");
+          } catch (e) {}
+          this.syncToggleUI();
+          if (!this.muted) {
+            this.unlock();
+            this.playChip();
+          }
+        },
+
+        syncToggleUI() {
+          const icon = document.getElementById("soundToggleIcon");
+          const lbl = document.getElementById("soundToggleLabel");
+          if (icon) icon.textContent = this.muted ? "🔇" : "🔊";
+          if (lbl) lbl.textContent = this.muted ? "Sound Off" : "Sound On";
+        },
+
+        playFlip() {
+          if (this.muted) return;
+          this.unlock();
+          const ctx = this.ctx;
+          if (!ctx) return;
+          try {
+            const now = ctx.currentTime;
+            const bufferSize = Math.floor(ctx.sampleRate * 0.045);
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.35));
+            }
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = "bandpass";
+            filter.frequency.setValueAtTime(1600, now);
+            filter.Q.setValueAtTime(1.4, now);
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+            noise.start(now);
+          } catch (e) {}
+        },
+
+        playChip() {
+          if (this.muted) return;
+          this.unlock();
+          const ctx = this.ctx;
+          if (!ctx) return;
+          try {
+            const now = ctx.currentTime;
+            [1880, 2860].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = idx === 0 ? "triangle" : "sine";
+              osc.frequency.setValueAtTime(freq, now);
+              osc.frequency.exponentialRampToValueAtTime(freq * 0.94, now + 0.08);
+              gain.gain.setValueAtTime(idx === 0 ? 0.11 : 0.06, now);
+              gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(now);
+              osc.stop(now + 0.085);
+            });
+          } catch (e) {}
+        },
+
+        playTurn() {
+          if (this.muted) return;
+          this.unlock();
+          const ctx = this.ctx;
+          if (!ctx) return;
+          try {
+            const now = ctx.currentTime;
+            [659.25, 880].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = "sine";
+              const start = now + idx * 0.085;
+              osc.frequency.setValueAtTime(freq, start);
+              gain.gain.setValueAtTime(0.001, start);
+              gain.gain.linearRampToValueAtTime(0.12, start + 0.015);
+              gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(start);
+              osc.stop(start + 0.24);
+            });
+          } catch (e) {}
+        },
+
+        playSideShow() {
+          if (this.muted) return;
+          this.unlock();
+          const ctx = this.ctx;
+          if (!ctx) return;
+          try {
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.exponentialRampToValueAtTime(740, now + 0.26);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.29);
+          } catch (e) {}
+        },
+
+        playWin() {
+          if (this.muted) return;
+          this.unlock();
+          const ctx = this.ctx;
+          if (!ctx) return;
+          try {
+            const now = ctx.currentTime;
+            [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = "triangle";
+              const start = now + idx * 0.075;
+              osc.frequency.setValueAtTime(freq, start);
+              gain.gain.setValueAtTime(0.001, start);
+              gain.gain.linearRampToValueAtTime(0.13, start + 0.02);
+              gain.gain.exponentialRampToValueAtTime(0.001, start + 0.34);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(start);
+              osc.stop(start + 0.36);
+            });
+          } catch (e) {}
+        }
+      };
+
       function getClientToken() {
         try {
           let t = localStorage.getItem(TOKEN_STORAGE_KEY) || sessionStorage.getItem("falas_clean_token");
@@ -1127,7 +1508,9 @@
         guestConns: new Map(),
         lobby: null,
         game: null,
+        prevGame: null,
         settlement: null,
+        spectatorPromptInfo: null,
         actionPending: false,
         connectTimer: null,
         heartbeatInterval: null,
@@ -1138,6 +1521,12 @@
         showdownRevealedAt: 0,
         lastTrackedTurnKey: "",
         lastTrackedRound: -1,
+        lastTriggeredDeltaSeq: 0,
+        revealedShowdownRound: -1,
+        squeezeTimers: [],
+        peekHolding: false,
+        cardsLockedOpen: false,
+        showHandHint: true,
         wakeLock: null,
         renderCache: {
           roundNumber: -1,
@@ -1148,6 +1537,7 @@
 
       const host = {
         active: false,
+        isBotMode: false,
         roomCode: "",
         hostToken: CLIENT_TOKEN,
         totalPlayers: 4,
@@ -1155,9 +1545,13 @@
         turnDurationSec: 25,
         turnDeadline: null,
         players: [],
+        spectators: [],
+        hisabLog: [],
         started: false,
         settled: false,
         phase: "lobby",
+        wasActualShow: false,
+        roundResultSeq: 0,
         currentStake: 20,
         pot: 0,
         dealerIndex: 0,
@@ -1166,10 +1560,25 @@
         latestFeed: "",
         pendingSideShow: null,
         settlementReport: null,
-        watchdogInterval: null
+        watchdogInterval: null,
+        botTurnTimer: null
       };
 
       let selectedSetupTimerSec = 25;
+      let selectedSoloBots = 3;
+      let selectedSoloBet = 20;
+
+      /* Global Release Listeners for Press-and-Hold Corner Peek */
+      function releaseCornerPeek() {
+        if (!client.peekHolding) return;
+        client.peekHolding = false;
+        if (client.game) {
+          renderGame();
+        }
+      }
+      window.addEventListener("pointerup", releaseCornerPeek);
+      window.addEventListener("pointercancel", releaseCornerPeek);
+      window.addEventListener("blur", releaseCornerPeek);
 
       document.addEventListener("keydown", e => {
         if ((e.key === "Enter" || e.key === " ") && document.activeElement?.getAttribute("role") === "button") {
@@ -1178,7 +1587,7 @@
         }
       });
 
-      /* Screen Wake Lock API: prevents phone screens from dimming mid-hand */
+      /* Screen Wake Lock API */
       async function requestScreenWakeLock() {
         try {
           if ("wakeLock" in navigator && !client.wakeLock) {
@@ -1207,7 +1616,6 @@
           if (inActiveView) {
             requestScreenWakeLock();
           }
-          // If guest returned from background tab and connection dropped, reconnect immediately
           if (client.role === "guest" && client.roomCode && (!client.hostConn || !client.hostConn.open)) {
             scheduleGuestReconnect(true);
           }
@@ -1283,29 +1691,34 @@
 
         const roomPill = document.getElementById("headerRoomPill");
         const stopBtn = document.getElementById("btnHostStopSettle");
+        const hisabBtn = document.getElementById("btnHeaderHisab");
 
         if (name === "setup") {
           document.getElementById("hostSetupScreen").classList.remove("hidden");
           roomPill.classList.add("hidden");
           roomPill.classList.remove("flex");
           stopBtn.classList.add("hidden");
+          hisabBtn.classList.add("hidden");
           releaseScreenWakeLock();
         } else if (name === "visitorJoin") {
           document.getElementById("visitorJoinScreen").classList.remove("hidden");
           roomPill.classList.remove("hidden");
           roomPill.classList.add("flex");
           stopBtn.classList.add("hidden");
+          hisabBtn.classList.add("hidden");
         } else if (name === "lobby") {
           document.getElementById("lobbyScreen").classList.remove("hidden");
           roomPill.classList.remove("hidden");
           roomPill.classList.add("flex");
           stopBtn.classList.add("hidden");
+          hisabBtn.classList.add("hidden");
           requestScreenWakeLock();
         } else if (name === "game") {
           document.getElementById("gameScreen").classList.remove("hidden");
           document.getElementById("bottomActionBar").classList.remove("hidden");
           roomPill.classList.remove("hidden");
           roomPill.classList.add("flex");
+          hisabBtn.classList.remove("hidden");
           if (client.role === "host") {
             stopBtn.classList.remove("hidden");
           } else {
@@ -1317,6 +1730,7 @@
           roomPill.classList.remove("hidden");
           roomPill.classList.add("flex");
           stopBtn.classList.add("hidden");
+          hisabBtn.classList.remove("hidden");
           releaseScreenWakeLock();
         }
       }
@@ -1324,22 +1738,56 @@
       function switchLandingMode(mode) {
         const tabCreate = document.getElementById("tabCreateTable");
         const tabJoin = document.getElementById("tabJoinTable");
+        const tabSolo = document.getElementById("tabSoloBots");
         const panelCreate = document.getElementById("landingCreatePanel");
         const panelJoin = document.getElementById("landingJoinPanel");
+        const panelSolo = document.getElementById("landingSoloPanel");
+
+        const inactiveTabClass = "btn-div py-2.5 px-2 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs text-center shadow-none";
+        const activeGoldTabClass = "btn-div py-2.5 px-2 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs text-center";
+        const activeEmeraldTabClass = "btn-div py-2.5 px-2 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-xs text-center";
+
+        tabCreate.className = inactiveTabClass;
+        tabJoin.className = inactiveTabClass;
+        tabSolo.className = inactiveTabClass;
+        panelCreate.classList.add("hidden");
+        panelJoin.classList.add("hidden");
+        panelSolo.classList.add("hidden");
 
         if (mode === "join") {
-          tabJoin.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400 text-felt-950 font-black text-xs sm:text-sm text-center";
-          tabCreate.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none";
-          panelCreate.classList.add("hidden");
+          tabJoin.className = activeEmeraldTabClass;
           panelJoin.classList.remove("hidden");
           setTimeout(() => document.getElementById("landingJoinCodeInput").focus(), 40);
+        } else if (mode === "solo") {
+          tabSolo.className = activeEmeraldTabClass;
+          panelSolo.classList.remove("hidden");
+          setTimeout(() => document.getElementById("soloNameInput").focus(), 40);
         } else {
-          tabCreate.className = "btn-div py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm text-center";
-          tabJoin.className = "btn-div py-2.5 px-3 rounded-xl text-emerald-200 hover:text-white font-extrabold text-xs sm:text-sm text-center shadow-none";
-          panelJoin.classList.add("hidden");
+          tabCreate.className = activeGoldTabClass;
           panelCreate.classList.remove("hidden");
           setTimeout(() => document.getElementById("hostNameInput").focus(), 40);
         }
+      }
+
+      function setSoloBotCount(count) {
+        selectedSoloBots = count;
+        document.getElementById("soloBotCountLabel").textContent = `${count} Bots (${count + 1}-Seat Table)`;
+        document.querySelectorAll("[data-bot-count]").forEach(el => {
+          const val = parseInt(el.getAttribute("data-bot-count"), 10);
+          el.className = val === count
+            ? "btn-div py-2 rounded-xl bg-amber-400/20 border border-amber-400/60 text-center text-xs font-black text-amber-300"
+            : "btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100";
+        });
+      }
+
+      function setSoloBetAmount(amt) {
+        selectedSoloBet = amt;
+        document.querySelectorAll("[data-solo-bet]").forEach(el => {
+          const val = parseInt(el.getAttribute("data-solo-bet"), 10);
+          el.className = val === amt
+            ? "btn-div py-2 rounded-xl bg-amber-400/20 border border-amber-400/60 text-center text-xs font-black text-amber-300"
+            : "btn-div py-2 rounded-xl silk-inset hover:border-amber-400/40 text-center text-xs font-bold text-emerald-100";
+        });
       }
 
       function connectFromLandingJoin() {
@@ -1405,6 +1853,11 @@
         if (banner) banner.classList.remove("hidden");
       }
 
+      function clearSqueezeTimers() {
+        client.squeezeTimers.forEach(t => clearTimeout(t));
+        client.squeezeTimers = [];
+      }
+
       function destroyConnections() {
         if (client.connectTimer) {
           clearTimeout(client.connectTimer);
@@ -1422,6 +1875,11 @@
           clearInterval(host.watchdogInterval);
           host.watchdogInterval = null;
         }
+        if (host.botTurnTimer) {
+          clearTimeout(host.botTurnTimer);
+          host.botTurnTimer = null;
+        }
+        clearSqueezeTimers();
         client.reconnectAttempts = 0;
         hideReconnectBanner();
 
@@ -1434,22 +1892,31 @@
         client.role = null;
         client.lobby = null;
         client.game = null;
+        client.prevGame = null;
         client.settlement = null;
+        client.spectatorPromptInfo = null;
         client.actionPending = false;
         client.lastTrackedTurnKey = "";
         client.lastTrackedRound = -1;
+        client.lastTriggeredDeltaSeq = 0;
+        client.revealedShowdownRound = -1;
+        client.peekHolding = false;
+        client.cardsLockedOpen = false;
         client.renderCache = { roundNumber: -1, playerIdsKey: "", lobbyQrKey: "" };
         host.active = false;
+        host.isBotMode = false;
         host.started = false;
         host.settled = false;
+        host.spectators = [];
+        host.hisabLog = [];
         host.turnDeadline = null;
         host.pendingSideShow = null;
       }
 
-      /* Host State Persistence (Crash & Refresh Safety) */
+      /* Host State Persistence */
       function saveHostBackup() {
         try {
-          if (!host.active || host.settled || !host.roomCode) {
+          if (!host.active || host.isBotMode || host.settled || !host.roomCode) {
             localStorage.removeItem(HOST_BACKUP_KEY);
             return;
           }
@@ -1466,14 +1933,27 @@
               peerId: p.isHost ? "HOST_LOCAL" : null,
               token: p.token,
               isHost: p.isHost,
+              isBot: false,
               net: p.net,
+              roundStartNet: p.roundStartNet || 0,
+              lastRoundDelta: p.lastRoundDelta || 0,
               cards: p.cards,
               status: p.status,
               roundBet: p.roundBet,
               handsWon: p.handsWon
             })),
+            spectators: host.spectators.map(s => ({
+              id: s.id,
+              name: s.name,
+              peerId: null,
+              token: s.token,
+              queued: Boolean(s.queued)
+            })),
+            hisabLog: host.hisabLog,
             started: host.started,
             phase: host.phase,
+            wasActualShow: host.wasActualShow,
+            roundResultSeq: host.roundResultSeq,
             currentStake: host.currentStake,
             pot: host.pot,
             dealerIndex: host.dealerIndex,
@@ -1535,6 +2015,210 @@
         } catch (e) {}
       }
 
+      /* Solo Practice vs Smart Bots Boot */
+      function startSoloBotGame() {
+        const nameInput = document.getElementById("soloNameInput");
+        const playerName = (nameInput.value || "").trim() || "You";
+        const botCount = Math.max(2, Math.min(5, selectedSoloBots));
+        const betAmount = Math.max(1, selectedSoloBet);
+
+        clearGuestSavedRoom();
+        destroyConnections();
+
+        client.role = "host";
+        client.roomCode = "SOLO";
+
+        host.active = true;
+        host.isBotMode = true;
+        host.roomCode = "SOLO";
+        host.hostToken = CLIENT_TOKEN;
+        host.totalPlayers = botCount + 1;
+        host.betAmount = betAmount;
+        host.turnDurationSec = 0; // No rush timer in solo bot practice
+        host.turnDeadline = null;
+        host.started = true;
+        host.settled = false;
+        host.hisabLog = [];
+        host.spectators = [];
+        host.roundNumber = 0;
+        host.dealerIndex = 0;
+
+        host.players = [{
+          id: "p_0",
+          name: playerName.slice(0, 16),
+          peerId: "HOST_LOCAL",
+          token: CLIENT_TOKEN,
+          isHost: true,
+          isBot: false,
+          net: 0,
+          roundStartNet: 0,
+          lastRoundDelta: 0,
+          cards: [],
+          status: "blind",
+          roundBet: 0,
+          handsWon: 0
+        }];
+
+        for (let i = 0; i < botCount; i++) {
+          const prof = BOT_PROFILES[i % BOT_PROFILES.length];
+          host.players.push({
+            id: `bot_${i + 1}`,
+            name: prof.name,
+            peerId: null,
+            token: `bot_tok_${i + 1}`,
+            isHost: false,
+            isBot: true,
+            botStyle: prof.style,
+            botBlindTurns: 0,
+            botSeenTurns: 0,
+            net: 0,
+            roundStartNet: 0,
+            lastRoundDelta: 0,
+            cards: [],
+            status: "blind",
+            roundBet: 0,
+            handsWon: 0
+          });
+        }
+
+        document.getElementById("headerRoomCode").textContent = "SOLO";
+        document.getElementById("headerConnDot").className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+        startNextRound();
+      }
+
+      /* Smart Bot AI Engine */
+      function scheduleBotTurnIfNeeded() {
+        if (!host.active || !host.isBotMode || !host.started || host.settled) return;
+        if (host.phase !== "playing") return;
+
+        if (host.botTurnTimer) {
+          clearTimeout(host.botTurnTimer);
+          host.botTurnTimer = null;
+        }
+
+        // Case 1: Bot is target of a Side Show request
+        if (host.pendingSideShow) {
+          const target = host.players.find(p => p.id === host.pendingSideShow.targetId);
+          if (target && target.isBot) {
+            host.botTurnTimer = setTimeout(() => {
+              if (!host.active || !host.pendingSideShow || host.pendingSideShow.targetId !== target.id) return;
+              const accept = decideBotSideShowAnswer(target);
+              onHostReceive("BOT_AI", {
+                type: "SIDE_SHOW_ANSWER",
+                accept,
+                token: target.token
+              });
+            }, 1150);
+          }
+          return;
+        }
+
+        // Case 2: Active turn belongs to a Bot
+        const cur = host.players[host.turnIndex];
+        if (!cur || !cur.isBot) return;
+
+        const thinkMs = 950 + Math.floor(Math.random() * 650);
+        host.botTurnTimer = setTimeout(() => {
+          if (!host.active || host.phase !== "playing" || host.pendingSideShow) return;
+          const activeBot = host.players[host.turnIndex];
+          if (!activeBot || activeBot.id !== cur.id) return;
+          executeBotMove(activeBot);
+        }, thinkMs);
+      }
+
+      function decideBotSideShowAnswer(bot) {
+        const ev = evaluateFalasHand(bot.cards);
+        if (ev.cat >= 2) return true; // Jut or better always accepts
+        if (ev.cat === 1 && ev.tie[0] >= 13) return Math.random() < 0.65; // K or A high often accepts
+        return Math.random() < 0.25;
+      }
+
+      function executeBotMove(bot) {
+        const rem = activePlayers();
+        const style = bot.botStyle || "balanced";
+
+        // Step 1: Decide whether to stay Blind or See Cards
+        if (bot.status === "blind") {
+          const maxBlindTurns = style === "daredevil" ? 3 : style === "balanced" ? 2 : 1;
+          const shouldSeeNow = bot.botBlindTurns >= maxBlindTurns || (rem.length === 2 && bot.botBlindTurns >= 1 && Math.random() < 0.65);
+
+          if (!shouldSeeNow) {
+            bot.botBlindTurns += 1;
+            if (rem.length === 2 && bot.botBlindTurns >= 2 && Math.random() < 0.45) {
+              performFinalShow();
+            } else {
+              performBet(bot, 1);
+            }
+            return;
+          }
+
+          // Bot sees its cards, then acts after a brief pause
+          bot.status = "seen";
+          host.latestFeed = `${bot.name} saw their cards`;
+          hostSyncAll();
+          return;
+        }
+
+        // Step 2: Bot is Seen — evaluate hand strength
+        bot.botSeenTurns = (bot.botSeenTurns || 0) + 1;
+        const ev = evaluateFalasHand(bot.cards);
+        const nextIdx = nextActiveIndex(host.turnIndex);
+        const nextPlayer = nextIdx !== -1 ? host.players[nextIdx] : null;
+        const canSideShow = rem.length >= 3 && bot.status === "seen" && nextPlayer && nextPlayer.status === "seen";
+
+        // Monster hands: Trial (6), Double Run (5), Run (4)
+        if (ev.cat >= 4) {
+          if (rem.length === 2 && bot.botSeenTurns >= 2 && Math.random() < 0.65) {
+            performFinalShow();
+          } else if (canSideShow && Math.random() < 0.45) {
+            triggerSideShow(bot);
+          } else {
+            performBet(bot, 1);
+          }
+          return;
+        }
+
+        // Strong / Medium hands: Color (3) or Jut (2)
+        if (ev.cat === 3 || (ev.cat === 2 && ev.tie[0] >= 9)) {
+          if (rem.length === 2 && bot.botSeenTurns >= 2) {
+            performFinalShow();
+          } else if (canSideShow && bot.botSeenTurns >= 2 && Math.random() < 0.5) {
+            triggerSideShow(bot);
+          } else if (bot.botSeenTurns >= 4 && style === "cautious") {
+            performPack(bot);
+          } else {
+            performBet(bot, 1);
+          }
+          return;
+        }
+
+        // Low Jut (2s-8s) or High Card Ace/King
+        if (ev.cat === 2 || (ev.cat === 1 && ev.tie[0] >= 13)) {
+          if (rem.length === 2) {
+            if (bot.botSeenTurns >= 1 && Math.random() < 0.7) {
+              performFinalShow();
+            } else {
+              performBet(bot, 1);
+            }
+          } else if (bot.botSeenTurns <= 1 && style !== "cautious") {
+            performBet(bot, 1);
+          } else if (canSideShow && style === "daredevil" && Math.random() < 0.4) {
+            triggerSideShow(bot);
+          } else {
+            performPack(bot);
+          }
+          return;
+        }
+
+        // Weak High Card (< King)
+        if (rem.length === 2 && style === "daredevil" && bot.botSeenTurns === 1 && Math.random() < 0.35) {
+          performFinalShow();
+        } else {
+          performPack(bot);
+        }
+      }
+
+      /* Multiplayer Host Setup */
       function completeHostSetup() {
         const nameInput = document.getElementById("hostNameInput");
         const countInput = document.getElementById("playerCountInput");
@@ -1568,18 +2252,24 @@
         destroyConnections();
 
         host.active = true;
+        host.isBotMode = false;
         host.hostToken = CLIENT_TOKEN;
         host.totalPlayers = totalPlayers;
         host.betAmount = betAmount;
         host.turnDurationSec = selectedSetupTimerSec;
         host.turnDeadline = null;
+        host.spectators = [];
+        host.hisabLog = [];
         host.players = [{
           id: "p_0",
           name: hostName,
           peerId: "HOST_LOCAL",
           token: CLIENT_TOKEN,
           isHost: true,
+          isBot: false,
           net: 0,
+          roundStartNet: 0,
+          lastRoundDelta: 0,
           cards: [],
           status: "blind",
           roundBet: 0,
@@ -1604,6 +2294,7 @@
         destroyConnections();
 
         host.active = true;
+        host.isBotMode = false;
         host.roomCode = backup.roomCode;
         host.hostToken = backup.hostToken || CLIENT_TOKEN;
         host.totalPlayers = backup.totalPlayers || 4;
@@ -1613,9 +2304,15 @@
           ...p,
           peerId: p.isHost ? "HOST_LOCAL" : null
         }));
+        host.spectators = Array.isArray(backup.spectators)
+          ? backup.spectators.map(s => ({ ...s, peerId: null }))
+          : [];
+        host.hisabLog = Array.isArray(backup.hisabLog) ? backup.hisabLog : [];
         host.started = Boolean(backup.started);
         host.settled = false;
         host.phase = backup.phase || "lobby";
+        host.wasActualShow = Boolean(backup.wasActualShow);
+        host.roundResultSeq = backup.roundResultSeq || 0;
         host.currentStake = backup.currentStake || host.betAmount;
         host.pot = backup.pot || 0;
         host.dealerIndex = backup.dealerIndex || 0;
@@ -1624,7 +2321,6 @@
         host.latestFeed = backup.latestFeed || "Host resumed table";
         host.pendingSideShow = backup.pendingSideShow || null;
 
-        // Refresh turn deadline on host resume so active player gets full remaining time
         if (host.started && host.phase === "playing" && host.turnDurationSec > 0) {
           host.turnDeadline = Date.now() + host.turnDurationSec * 1000;
         } else {
@@ -1680,6 +2376,7 @@
           });
           conn.on("close", () => {
             client.guestConns.delete(conn.peer);
+            // Mark spectator offline if they closed tab (keep queued slot briefly in case of refresh)
             if (host.pendingSideShow) {
               const target = host.players.find(p => p.id === host.pendingSideShow.targetId);
               const requester = host.players.find(p => p.id === host.pendingSideShow.requesterId);
@@ -1701,7 +2398,6 @@
           if (err && err.type === "unavailable-id") {
             try { peer.destroy(); } catch (e) {}
             if (fixedCode) {
-              // Wait briefly for PeerJS signaling server to release old socket on host refresh
               setTimeout(() => bootHostPeer(retry + 1, fixedCode), 1100);
             } else {
               bootHostPeer(retry + 1, null);
@@ -1712,7 +2408,7 @@
 
       /* Host Authoritative Turn Timer Watchdog */
       function armTurnDeadline() {
-        if (host.started && host.phase === "playing" && host.turnDurationSec > 0) {
+        if (host.started && host.phase === "playing" && host.turnDurationSec > 0 && !host.isBotMode) {
           host.turnDeadline = Date.now() + host.turnDurationSec * 1000;
         } else {
           host.turnDeadline = null;
@@ -1722,16 +2418,14 @@
       function startHostWatchdog() {
         if (host.watchdogInterval) clearInterval(host.watchdogInterval);
         host.watchdogInterval = setInterval(() => {
-          if (!host.active || !host.started || host.settled) return;
+          if (!host.active || !host.started || host.settled || host.isBotMode) return;
           if (host.phase !== "playing" || !host.turnDeadline) return;
           if (Date.now() < host.turnDeadline) return;
 
-          // Deadline expired
           host.turnDeadline = null;
 
           if (host.pendingSideShow) {
-            const { requesterId, targetId } = host.pendingSideShow;
-            const req = host.players.find(p => p.id === requesterId);
+            const { targetId } = host.pendingSideShow;
             const tgt = host.players.find(p => p.id === targetId);
             host.pendingSideShow = null;
             if (tgt) {
@@ -1787,6 +2481,28 @@
         } catch (e) {
           qrBox.innerHTML = `<span class="font-display font-black text-base tracking-widest text-felt-950">${esc(cleanCode)}</span>`;
         }
+      }
+
+      /* 1-Tap Native Mobile Share + Clipboard Fallback */
+      async function shareOrCopyInvite() {
+        const code = (client.lobby && client.lobby.roomCode) || client.roomCode || host.roomCode || "";
+        if (!code) return;
+        const link = getShareLink(code);
+        const shareData = {
+          title: `फलास — Table ${code}`,
+          text: `Join my फलास (Falas) card table! Table Code: ${code}`,
+          url: link
+        };
+
+        if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+          try {
+            await navigator.share(shareData);
+            return;
+          } catch (err) {
+            if (err && err.name === "AbortError") return;
+          }
+        }
+        copyShareUrl();
       }
 
       function copyShareUrl() {
@@ -1939,7 +2655,6 @@
         client.heartbeatInterval = setInterval(() => {
           if (client.role !== "guest" || !client.roomCode || client.settlement) return;
           if (client.hostConn && client.hostConn.open) {
-            // Check if host went silent (e.g., host refreshed tab and WebRTC socket hasn't closed yet)
             if (client.lastHostPongAt && Date.now() - client.lastHostPongAt > 9500) {
               document.getElementById("headerConnDot").className = "w-2 h-2 rounded-full bg-amber-400";
               scheduleGuestReconnect(true);
@@ -1984,6 +2699,7 @@
       }
 
       function sendIntent(payload) {
+        SoundFX.unlock();
         if (client.actionPending) return;
         client.actionPending = true;
         const barBtns = document.querySelectorAll("#bottomActionContent .btn-div");
@@ -2016,7 +2732,11 @@
           inp.focus();
           return;
         }
-        sendIntent({ type: "VISITOR_JOIN", name });
+        if (client.spectatorPromptInfo) {
+          sendIntent({ type: "SPECTATOR_JOIN", name, autoQueue: true });
+        } else {
+          sendIntent({ type: "VISITOR_JOIN", name });
+        }
       }
 
       function hostStartGameEarly() {
@@ -2064,7 +2784,7 @@
         const isShowdown = host.phase === "showdown";
 
         const safePlayers = host.players.map(p => {
-          const isMe = (peerId && p.peerId === peerId) || (token && p.token === token);
+          const isMe = !p.isBot && ((peerId && p.peerId === peerId) || (token && p.token === token));
           const allowCards = isShowdown || (isMe && p.status === "seen");
           const visibleCards = allowCards ? p.cards : [null, null, null];
           const handEval = allowCards && p.cards.length === 3 ? evaluateFalasHand(p.cards) : null;
@@ -2074,17 +2794,23 @@
             name: p.name,
             isMe: Boolean(isMe),
             isHost: p.isHost,
+            isBot: Boolean(p.isBot),
             net: p.net,
+            lastRoundDelta: p.lastRoundDelta || 0,
             status: p.status,
             roundBet: p.roundBet,
             handsWon: p.handsWon,
             cards: visibleCards,
-            handName: handEval ? handEval.name : null
+            handName: handEval ? handEval.name : null,
+            handCat: handEval ? handEval.cat : 0
           };
         });
 
+        const specMatch = host.spectators.find(s => (peerId && s.peerId === peerId) || (token && s.token === token));
+
         return {
           roomCode: host.roomCode,
+          isBotMode: Boolean(host.isBotMode),
           betAmount: host.betAmount,
           currentStake: host.currentStake,
           pot: host.pot,
@@ -2092,9 +2818,19 @@
           turnIndex: host.turnIndex,
           roundNumber: host.roundNumber,
           phase: host.phase,
+          wasActualShow: Boolean(host.wasActualShow),
+          roundResultSeq: host.roundResultSeq,
           turnDurationSec: host.turnDurationSec,
           turnDeadline: host.turnDeadline,
           latestFeed: host.latestFeed,
+          hisabLog: host.hisabLog,
+          spectatorCount: host.spectators.length,
+          spectatorMe: specMatch ? {
+            id: specMatch.id,
+            name: specMatch.name,
+            queued: Boolean(specMatch.queued),
+            tableFull: host.players.length >= 17
+          } : null,
           pendingSideShow: host.pendingSideShow ? {
             requesterId: host.pendingSideShow.requesterId,
             requesterName: host.pendingSideShow.requesterName,
@@ -2134,6 +2870,8 @@
             game: buildFilteredGameSnapshot(pid, entry.token)
           });
         });
+
+        scheduleBotTurnIfNeeded();
       }
 
       function onHostReceive(senderPeerId, msg) {
@@ -2150,27 +2888,37 @@
             const existing = host.players.find(p => p.token === token);
             if (existing) existing.peerId = senderPeerId;
 
+            const existingSpec = host.spectators.find(s => s.token === token);
+            if (existingSpec) existingSpec.peerId = senderPeerId;
+
             if (host.settled) {
-              if (existing) {
+              if (existing || existingSpec) {
                 sendToPeer(senderPeerId, { type: "SETTLEMENT_STATE", settlement: host.settlementReport });
               } else {
                 sendToPeer(senderPeerId, { type: "REJECT_JOIN", msg: "This table has already ended" });
               }
             } else if (host.started) {
-              if (existing) {
+              if (existing || existingSpec) {
                 sendToPeer(senderPeerId, {
                   type: "GAME_STATE",
                   game: buildFilteredGameSnapshot(senderPeerId, token)
                 });
-                // Re-send Side Show prompt if this reconnecting player is currently being challenged
-                if (host.pendingSideShow && host.pendingSideShow.targetId === existing.id) {
+                if (existing && host.pendingSideShow && host.pendingSideShow.targetId === existing.id) {
                   sendToPeer(senderPeerId, {
                     type: "SIDE_SHOW_PROMPT",
                     requesterName: host.pendingSideShow.requesterName
                   });
                 }
               } else {
-                sendToPeer(senderPeerId, { type: "REJECT_JOIN", msg: "Game already in progress" });
+                const hostPlayer = host.players.find(p => p.isHost);
+                sendToPeer(senderPeerId, {
+                  type: "SPECTATOR_PROMPT",
+                  roomCode: host.roomCode,
+                  hostName: hostPlayer ? hostPlayer.name : "Host",
+                  betAmount: host.betAmount,
+                  roundNumber: host.roundNumber,
+                  playerCount: host.players.length
+                });
               }
             } else {
               sendToPeer(senderPeerId, { type: "LOBBY_STATE", lobby: buildLobbySnapshot() });
@@ -2203,7 +2951,10 @@
               peerId: senderPeerId,
               token: token,
               isHost: false,
+              isBot: false,
               net: 0,
+              roundStartNet: 0,
+              lastRoundDelta: 0,
               cards: [],
               status: "blind",
               roundBet: 0,
@@ -2218,6 +2969,47 @@
             } else {
               hostSyncAll();
             }
+            break;
+          }
+
+          case "SPECTATOR_JOIN": {
+            if (!host.started || host.settled) return;
+            if (host.players.some(p => p.token === token)) {
+              hostSyncAll();
+              return;
+            }
+            const cleanName = String(msg.name || "").trim().slice(0, 16);
+            if (!cleanName) return;
+
+            const existingSpec = host.spectators.find(s => s.token === token);
+            if (existingSpec) {
+              existingSpec.name = cleanName;
+              existingSpec.peerId = senderPeerId;
+              existingSpec.queued = Boolean(msg.autoQueue);
+            } else {
+              host.spectators.push({
+                id: `spec_${Date.now().toString(36)}_${host.spectators.length}`,
+                name: cleanName,
+                peerId: senderPeerId,
+                token: token,
+                queued: Boolean(msg.autoQueue)
+              });
+              host.latestFeed = `${cleanName} joined as Spectator`;
+            }
+            hostSyncAll();
+            break;
+          }
+
+          case "SPECTATOR_TOGGLE_QUEUE": {
+            if (!host.started || host.settled) return;
+            const spec = host.spectators.find(s => s.token === token || s.peerId === senderPeerId);
+            if (!spec) return;
+            if (!spec.queued && host.players.length >= 17) {
+              sendToPeer(senderPeerId, { type: "TOAST", msg: "Table is at max 17 players", tone: "warn" });
+              return;
+            }
+            spec.queued = !spec.queued;
+            hostSyncAll();
             break;
           }
 
@@ -2269,7 +3061,7 @@
             if (!host.started || host.phase !== "playing" || host.pendingSideShow) return;
             const cur = host.players[host.turnIndex];
             if (!cur || (cur.token !== token && cur.peerId !== senderPeerId)) return;
-            performBet(cur, msg.mult === 2 ? 2 : 1);
+            performBet(cur);
             break;
           }
 
@@ -2428,8 +3220,51 @@
         host.pot += amount;
       }
 
+      function recordRoundCompletion(wonAmount, winnerNames, winReason, wasActualShow) {
+        for (const p of host.players) {
+          p.lastRoundDelta = p.net - (p.roundStartNet || 0);
+        }
+        host.wasActualShow = Boolean(wasActualShow);
+        host.roundResultSeq += 1;
+        host.hisabLog.unshift({
+          roundNumber: host.roundNumber,
+          pot: wonAmount,
+          winnerNames,
+          winReason
+        });
+      }
+
       function startNextRound() {
         host.pendingSideShow = null;
+        host.wasActualShow = false;
+
+        // Seat any queued spectators before dealing the new hand
+        if (host.spectators.length > 0 && host.players.length < 17) {
+          const remainingSpecs = [];
+          for (const s of host.spectators) {
+            if (s.queued && host.players.length < 17) {
+              host.players.push({
+                id: `p_${Date.now().toString(36)}_${host.players.length}`,
+                name: s.name,
+                peerId: s.peerId,
+                token: s.token,
+                isHost: false,
+                isBot: false,
+                net: 0,
+                roundStartNet: 0,
+                lastRoundDelta: 0,
+                cards: [],
+                status: "blind",
+                roundBet: 0,
+                handsWon: 0
+              });
+            } else {
+              remainingSpecs.push(s);
+            }
+          }
+          host.spectators = remainingSpecs;
+        }
+
         host.roundNumber += 1;
         host.pot = 0;
         host.currentStake = host.betAmount;
@@ -2440,9 +3275,15 @@
 
         const deck = shuffledDeck();
         for (const p of host.players) {
+          p.roundStartNet = p.net;
+          p.lastRoundDelta = 0;
           p.cards = [deck.pop(), deck.pop(), deck.pop()];
           p.status = "blind";
           p.roundBet = 0;
+          if (p.isBot) {
+            p.botBlindTurns = 0;
+            p.botSeenTurns = 0;
+          }
           chargePlayerToPot(p, host.betAmount);
         }
 
@@ -2453,15 +3294,13 @@
         hostSyncAll();
       }
 
-      function performBet(player, mult) {
-        if (mult === 2) {
-          host.currentStake = host.currentStake * 2;
-        }
+      /* Standard No-Limit Betting: Blind = betAmount, Chaal = 2 * betAmount (No 2x Raising) */
+      function performBet(player) {
         const isSeen = player.status === "seen";
         const amount = isSeen ? host.currentStake * 2 : host.currentStake;
         chargePlayerToPot(player, amount);
 
-        const actionWord = mult === 2 ? "raised" : (isSeen ? "played Chaal" : "played Blind");
+        const actionWord = isSeen ? "played Chaal" : "played Blind";
         host.latestFeed = `${player.name} ${actionWord} (${rs(amount)})`;
         advanceTurn();
         hostSyncAll();
@@ -2479,6 +3318,7 @@
           host.pot = 0;
           host.phase = "showdown";
           host.turnDeadline = null;
+          recordRoundCompletion(wonAmount, winner.name, "Everyone Packed", false);
           host.latestFeed = customFeed
             ? `${customFeed} • ${winner.name} wins ${rs(wonAmount)}`
             : `${winner.name} wins ${rs(wonAmount)}`;
@@ -2513,42 +3353,49 @@
         host.latestFeed = `${requester.name} requested Side Show with ${target.name}`;
         hostSyncAll();
 
-        sendToPeer(target.peerId, {
-          type: "SIDE_SHOW_PROMPT",
-          requesterName: requester.name
-        });
+        if (!target.isBot && target.peerId) {
+          sendToPeer(target.peerId, {
+            type: "SIDE_SHOW_PROMPT",
+            requesterName: requester.name
+          });
+        }
       }
 
       function resolveSideShow(requester, target) {
         const reqEval = evaluateFalasHand(requester.cards);
         const tgtEval = evaluateFalasHand(target.cards);
         const cmp = compareHands(reqEval, tgtEval);
+        // Standard Nepali rule: if exact tie (cmp === 0), challenger loses
         const loser = cmp === 1 ? target : requester;
         const winner = cmp === 1 ? requester : target;
         loser.status = "packed";
         host.latestFeed = `Side Show: ${winner.name} beat ${loser.name}`;
 
-        sendToPeer(requester.peerId, {
-          type: "SIDE_SHOW_RESULT",
-          myName: requester.name,
-          myCards: requester.cards,
-          myHandName: reqEval.name,
-          iWon: winner.id === requester.id,
-          theirName: target.name,
-          theirCards: target.cards,
-          theirHandName: tgtEval.name
-        });
+        if (!requester.isBot && requester.peerId) {
+          sendToPeer(requester.peerId, {
+            type: "SIDE_SHOW_RESULT",
+            myName: requester.name,
+            myCards: requester.cards,
+            myHandName: reqEval.name,
+            iWon: winner.id === requester.id,
+            theirName: target.name,
+            theirCards: target.cards,
+            theirHandName: tgtEval.name
+          });
+        }
 
-        sendToPeer(target.peerId, {
-          type: "SIDE_SHOW_RESULT",
-          myName: target.name,
-          myCards: target.cards,
-          myHandName: tgtEval.name,
-          iWon: winner.id === target.id,
-          theirName: requester.name,
-          theirCards: requester.cards,
-          theirHandName: reqEval.name
-        });
+        if (!target.isBot && target.peerId) {
+          sendToPeer(target.peerId, {
+            type: "SIDE_SHOW_RESULT",
+            myName: target.name,
+            myCards: target.cards,
+            myHandName: tgtEval.name,
+            iWon: winner.id === target.id,
+            theirName: requester.name,
+            theirCards: requester.cards,
+            theirHandName: reqEval.name
+          });
+        }
 
         advanceTurn();
         hostSyncAll();
@@ -2558,6 +3405,7 @@
         const rem = activePlayers();
         if (rem.length !== 2) return;
         const caller = host.players[host.turnIndex];
+        // Blind calls Show at Blind amount; Seen calls Show at Chaal (2x) amount
         const fee = caller.status === "seen" ? host.currentStake * 2 : host.currentStake;
         chargePlayerToPot(caller, fee);
 
@@ -2577,7 +3425,9 @@
         host.pot = 0;
         host.phase = "showdown";
         host.turnDeadline = null;
-        host.latestFeed = `${winners.map(w => w.name).join(" & ")} won ${rs(totalPot)} (${best.name})`;
+        const winnerLabel = winners.map(w => w.name).join(" & ");
+        recordRoundCompletion(totalPot, winnerLabel, best.name, true);
+        host.latestFeed = `${winnerLabel} won ${rs(totalPot)} (${best.name})`;
         hostSyncAll();
       }
 
@@ -2659,7 +3509,8 @@
           roomCode: host.roomCode,
           roundsPlayed: completedRounds,
           transfers,
-          standings
+          standings,
+          hisabLog: host.hisabLog
         };
 
         clearHostBackup();
@@ -2677,6 +3528,7 @@
 
           case "LOBBY_STATE": {
             client.actionPending = false;
+            client.spectatorPromptInfo = null;
             client.lobby = msg.lobby;
             if (msg.lobby && msg.lobby.roomCode) {
               client.roomCode = msg.lobby.roomCode;
@@ -2692,6 +3544,14 @@
             break;
           }
 
+          case "SPECTATOR_PROMPT": {
+            client.actionPending = false;
+            client.spectatorPromptInfo = msg;
+            showScreen("visitorJoin");
+            renderSpectatorJoinPrompt(msg);
+            break;
+          }
+
           case "REJECT_JOIN": {
             client.actionPending = false;
             clearGuestSavedRoom();
@@ -2702,9 +3562,15 @@
 
           case "GAME_STATE": {
             client.actionPending = false;
+            client.spectatorPromptInfo = null;
+            client.prevGame = client.game;
             client.game = msg.game;
             showScreen("game");
             renderGame();
+            processGameVisualAndAudioEffects(client.prevGame, client.game);
+            if (!document.getElementById("hisabDrawerOverlay").classList.contains("hidden")) {
+              renderHisabDrawerContent();
+            }
             break;
           }
 
@@ -2713,6 +3579,7 @@
             client.settlement = msg.settlement;
             clearGuestSavedRoom();
             hideReconnectBanner();
+            SoundFX.playWin();
             showScreen("settlement");
             renderSettlement();
             break;
@@ -2720,6 +3587,7 @@
 
           case "SIDE_SHOW_PROMPT": {
             haptic([20, 40, 20]);
+            SoundFX.playSideShow();
             const me = client.game?.players?.find(p => p.isMe);
             const myHandNote = me && me.handName ? ` (Your hand: ${esc(me.handName)})` : "";
             document.getElementById("sideShowPromptText").innerHTML =
@@ -2747,6 +3615,144 @@
         }
       }
 
+      /* Flying Chip Animations, Sound Triggers & Floating Seat Delta Popups */
+      function getSeatDomRect(player) {
+        if (!player) return null;
+        if (player.isMe) {
+          const el = document.querySelector("[data-my-seat-shell]");
+          return el ? el.getBoundingClientRect() : null;
+        }
+        const el = document.querySelector(`[data-opp-id="${player.id}"]`);
+        return el ? el.getBoundingClientRect() : null;
+      }
+
+      function spawnFlyingChip(fromRect, toRect, labelText, isWinSweep = false) {
+        const layer = document.getElementById("flyingChipLayer");
+        if (!layer || !fromRect || !toRect) return;
+
+        const chip = document.createElement("div");
+        chip.className = isWinSweep
+          ? "fixed px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-emerald-300 text-felt-950 font-black text-[11px] shadow-xl ring-2 ring-white/50"
+          : "fixed px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 font-black text-[11px] shadow-lg ring-1 ring-white/40";
+        chip.textContent = labelText;
+
+        const startX = fromRect.left + fromRect.width / 2;
+        const startY = fromRect.top + fromRect.height / 2;
+        const endX = toRect.left + toRect.width / 2;
+        const endY = toRect.top + toRect.height / 2;
+
+        chip.style.left = "0px";
+        chip.style.top = "0px";
+        layer.appendChild(chip);
+
+        const anim = chip.animate(
+          [
+            {
+              transform: `translate(${startX}px, ${startY}px) translate(-50%, -50%) scale(0.75)`,
+              opacity: 0.2
+            },
+            {
+              transform: `translate(${(startX + endX) / 2}px, ${(startY + endY) / 2 - 22}px) translate(-50%, -50%) scale(1.1)`,
+              opacity: 1,
+              offset: 0.45
+            },
+            {
+              transform: `translate(${endX}px, ${endY}px) translate(-50%, -50%) scale(0.85)`,
+              opacity: 0
+            }
+          ],
+          {
+            duration: 560,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            fill: "forwards"
+          }
+        );
+
+        anim.onfinish = () => {
+          chip.remove();
+          if (!isWinSweep) {
+            const potEl = document.getElementById("potValue");
+            if (potEl) {
+              potEl.style.transform = "scale(1.12)";
+              setTimeout(() => { potEl.style.transform = "scale(1)"; }, 160);
+            }
+          }
+        };
+      }
+
+      function spawnSeatDeltaPopup(player, delta) {
+        if (!player || !delta) return;
+        const hostEl = player.isMe
+          ? document.getElementById("mySeatCard")
+          : document.querySelector(`[data-opp-id="${player.id}"]`);
+        if (!hostEl) return;
+
+        const pill = document.createElement("div");
+        const isPos = delta > 0;
+        pill.className = isPos
+          ? "seat-delta-popup px-3 py-1 rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 text-felt-950 font-black text-xs sm:text-sm shadow-xl ring-2 ring-white/50"
+          : "seat-delta-popup px-2.5 py-0.5 rounded-full bg-rose-950/95 border border-rose-400/60 text-rose-200 font-extrabold text-xs shadow-lg";
+        pill.textContent = signedRs(delta);
+        hostEl.appendChild(pill);
+        setTimeout(() => pill.remove(), 2350);
+      }
+
+      function processGameVisualAndAudioEffects(prev, curr) {
+        if (!curr) return;
+
+        const potEl = document.getElementById("potValue");
+        const potRect = potEl ? potEl.getBoundingClientRect() : null;
+
+        // 1. New Round Dealt -> Play deal sound & fly ante chips from all seats to pot
+        if (!prev || prev.roundNumber !== curr.roundNumber) {
+          SoundFX.playFlip();
+          if (potRect) {
+            curr.players.forEach((p, idx) => {
+              setTimeout(() => {
+                const r = getSeatDomRect(p);
+                if (r) spawnFlyingChip(r, potRect, rs(curr.betAmount), false);
+              }, idx * 55);
+            });
+          }
+          return;
+        }
+
+        // 2. Same Round -> Detect bets/raises into the pot
+        if (curr.pot > prev.pot && potRect) {
+          SoundFX.playChip();
+          curr.players.forEach(p => {
+            const oldP = prev.players.find(op => op.id === p.id);
+            if (oldP && p.roundBet > oldP.roundBet) {
+              const diff = p.roundBet - oldP.roundBet;
+              const r = getSeatDomRect(p);
+              if (r) spawnFlyingChip(r, potRect, `+${rs(diff)}`, false);
+            }
+          });
+        }
+
+        // 3. Round Completed -> Play Win Chime, Sweep Chips to Winner & Float Seat Deltas
+        if (curr.phase === "showdown" && curr.roundResultSeq && client.lastTriggeredDeltaSeq !== curr.roundResultSeq) {
+          client.lastTriggeredDeltaSeq = curr.roundResultSeq;
+          SoundFX.playWin();
+
+          curr.players.forEach(p => {
+            if (p.lastRoundDelta !== 0) {
+              spawnSeatDeltaPopup(p, p.lastRoundDelta);
+            }
+            if (p.status === "winner" && potRect) {
+              const winRect = getSeatDomRect(p);
+              if (winRect) {
+                [0, 110, 220].forEach(delay => {
+                  setTimeout(() => {
+                    spawnFlyingChip(potRect, winRect, `+${rs(p.lastRoundDelta)}`, true);
+                  }, delay);
+                });
+              }
+            }
+          });
+        }
+      }
+
       function renderVisitorJoinPrompt() {
         const lobby = client.lobby;
         if (!lobby) return;
@@ -2757,8 +3763,9 @@
 
         document.getElementById("visitorSeatProgressBadge").textContent =
           isLastPerson ? `Last Seat (${total} of ${total})` : `Seat ${joinedCount + 1} of ${total}`;
+        document.getElementById("visitorHeading").textContent = "Enter Your Name";
         document.getElementById("visitorTableSubtext").textContent =
-          `Hosted by ${lobby.hostName} • Bet ${rs(lobby.betAmount)}`;
+          `Hosted by ${lobby.hostName} • Blind ${rs(lobby.betAmount)}`;
 
         const btn = document.getElementById("btnVisitorJoinOrStart");
         if (isLastPerson) {
@@ -2768,6 +3775,18 @@
           btn.textContent = "Join Table";
           btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-base text-center";
         }
+      }
+
+      function renderSpectatorJoinPrompt(info) {
+        document.getElementById("visitorSeatProgressBadge").textContent =
+          `Live Game • Round #${info.roundNumber || 1}`;
+        document.getElementById("visitorHeading").textContent = "Join as Spectator";
+        document.getElementById("visitorTableSubtext").textContent =
+          `Hosted by ${info.hostName} • Watch live & get dealt into the next round`;
+
+        const btn = document.getElementById("btnVisitorJoinOrStart");
+        btn.textContent = "Watch & Queue for Next Round →";
+        btn.className = "btn-div w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 via-teal-300 to-amber-400 text-felt-950 font-black text-sm sm:text-base text-center";
       }
 
       function renderLobby() {
@@ -2780,7 +3799,6 @@
         document.getElementById("lobbyCountHeading").textContent =
           `${lobby.joinedPlayers.length} / ${lobby.totalPlayers} Joined`;
 
-        // Host early start & seat count controls
         const hostControls = document.getElementById("hostLobbyControls");
         if (client.role === "host") {
           hostControls.classList.remove("hidden");
@@ -2828,6 +3846,17 @@
         document.getElementById("lobbyPlayersList").innerHTML = listHtml;
       }
 
+      function getHandStrengthTier(cat) {
+        switch (cat) {
+          case 6: return { label: "Nut Hand", tone: "text-amber-300" };
+          case 5: return { label: "Monster", tone: "text-emerald-300" };
+          case 4: return { label: "Strong", tone: "text-emerald-300" };
+          case 3: return { label: "Solid", tone: "text-sky-300" };
+          case 2: return { label: "Playable", tone: "text-amber-200" };
+          default: return { label: "High Card", tone: "text-emerald-200/80" };
+        }
+      }
+
       function renderCardFrontInner(card, size = "large") {
         if (!card) return "";
         const cornerText = size === "large" ? "text-sm sm:text-base" : "text-[11px]";
@@ -2872,33 +3901,96 @@
         `;
       }
 
-      function syncCardsContainer(cardsRowEl, cards, shouldBeFaceUp, size, isNewDeal) {
+      function flipSingleCardEl(flipper, card, size, withPulse = false) {
+        if (!flipper || !card) return;
+        const front = flipper.querySelector(".card-face-front");
+        if (front) {
+          front.className = `card-face card-face-front ${size === "large" ? "rounded-2xl" : "rounded-lg"} p-1.5 sm:p-2 flex flex-col justify-between ${card.color}`;
+          front.innerHTML = renderCardFrontInner(card, size);
+        }
+        if (!flipper.classList.contains("is-flipped")) {
+          SoundFX.playFlip();
+          requestAnimationFrame(() => {
+            flipper.classList.add("is-flipped");
+            if (withPulse && flipper.parentElement) {
+              flipper.parentElement.classList.add("animate-squeeze-reveal");
+            }
+          });
+        }
+      }
+
+      function syncCardsContainer(cardsRowEl, cards, shouldBeFaceUp, size, isNewDeal, dramaticSqueeze = false) {
         const flippers = cardsRowEl.querySelectorAll(".card-flipper");
         if (flippers.length !== 3 || isNewDeal) {
           cardsRowEl.innerHTML = cards
-            .map((c, idx) => renderFlipCard(c, shouldBeFaceUp, size, idx, isNewDeal))
+            .map((c, idx) => renderFlipCard(c, dramaticSqueeze ? false : shouldBeFaceUp, size, idx, isNewDeal))
             .join("");
+          if (!dramaticSqueeze) return;
+        }
+
+        const updatedFlippers = cardsRowEl.querySelectorAll(".card-flipper");
+
+        if (dramaticSqueeze && shouldBeFaceUp) {
+          // Dramatic card-by-card squeeze reveal: Card 1 (120ms), Card 2 (540ms), Card 3 (1150ms)
+          const delays = [120, 540, 1150];
+          updatedFlippers.forEach((flipper, idx) => {
+            const card = cards[idx];
+            if (!card) return;
+            const t = setTimeout(() => {
+              flipSingleCardEl(flipper, card, size, idx === 2);
+            }, delays[idx]);
+            client.squeezeTimers.push(t);
+          });
           return;
         }
 
-        flippers.forEach((flipper, idx) => {
+        updatedFlippers.forEach((flipper, idx) => {
           const card = cards[idx];
           const currentlyFlipped = flipper.classList.contains("is-flipped");
           const targetFlipped = Boolean(shouldBeFaceUp && card);
 
           if (!currentlyFlipped && targetFlipped) {
-            const front = flipper.querySelector(".card-face-front");
-            if (front) {
-              front.className = `card-face card-face-front ${size === "large" ? "rounded-2xl" : "rounded-lg"} p-1.5 sm:p-2 flex flex-col justify-between ${card.color}`;
-              front.innerHTML = renderCardFrontInner(card, size);
-            }
-            requestAnimationFrame(() => {
-              flipper.classList.add("is-flipped");
-            });
+            flipSingleCardEl(flipper, card, size, false);
           } else if (currentlyFlipped && !targetFlipped) {
             flipper.classList.remove("is-flipped");
           }
         });
+      }
+
+      /* Press-and-Hold Corner Peek & Face-Up Lock Handlers */
+      function handleCornerPeekDown(e) {
+        if (e && typeof e.preventDefault === "function") e.preventDefault();
+        SoundFX.unlock();
+        const game = client.game;
+        if (!game || game.phase !== "playing") return;
+        const me = game.players.find(p => p.isMe);
+        if (!me || me.status === "packed") return;
+
+        haptic(14);
+        client.peekHolding = true;
+
+        if (me.status === "blind") {
+          sendIntent({ type: "SEE_CARDS" });
+        } else {
+          renderGame();
+        }
+      }
+
+      function toggleCardsLockedOpen() {
+        SoundFX.unlock();
+        const game = client.game;
+        if (!game || game.phase !== "playing") return;
+        const me = game.players.find(p => p.isMe);
+        if (!me || me.status === "packed") return;
+
+        haptic(14);
+        if (me.status === "blind") {
+          client.cardsLockedOpen = true;
+          sendIntent({ type: "SEE_CARDS" });
+        } else {
+          client.cardsLockedOpen = !client.cardsLockedOpen;
+          renderGame();
+        }
       }
 
       /* Smooth 120ms UI Ticker for Turn Countdown Bar & Showdown Reveal Lock */
@@ -2906,14 +3998,12 @@
         const game = client.game;
         if (!game || document.getElementById("gameScreen").classList.contains("hidden")) return;
 
-        // Release 300ms turn-start misclick guard once elapsed
         if (client.turnGuardUntil && Date.now() >= client.turnGuardUntil) {
           client.turnGuardUntil = 0;
           renderBottomActionBarOnly();
         }
 
-        // Release 2.2s showdown reveal lock once elapsed
-        if (game.phase === "showdown" && client.showdownRevealedAt && Date.now() - client.showdownRevealedAt >= 2200) {
+        if (game.phase === "showdown" && client.showdownRevealedAt && Date.now() - client.showdownRevealedAt >= 2300) {
           client.showdownRevealedAt = 0;
           renderBottomActionBarOnly();
         }
@@ -2960,9 +4050,35 @@
         if (isNewDeal) {
           cache.roundNumber = game.roundNumber;
           cache.playerIdsKey = playerIdsKey;
+          clearSqueezeTimers();
+          client.peekHolding = false;
+          client.cardsLockedOpen = false;
         }
 
-        // Track turn transitions for the 300ms misclick safety guard
+        // Update Header Hisab Round Counter Badge
+        const hisabBadge = document.getElementById("headerHisabCountBadge");
+        if (hisabBadge) {
+          hisabBadge.textContent = String((game.hisabLog || []).length);
+        }
+
+        // Update Spectator Count Pill
+        const specPill = document.getElementById("spectatorCountPill");
+        if (specPill) {
+          if (game.spectatorCount > 0) {
+            specPill.classList.remove("hidden");
+            specPill.textContent = `👁 ${game.spectatorCount}`;
+          } else {
+            specPill.classList.add("hidden");
+          }
+        }
+
+        // Detect whether this showdown should trigger the Dramatic Card-by-Card Squeeze Reveal
+        let triggerDramaticSqueeze = false;
+        if (game.phase === "showdown" && game.wasActualShow && client.revealedShowdownRound !== game.roundNumber) {
+          client.revealedShowdownRound = game.roundNumber;
+          triggerDramaticSqueeze = true;
+        }
+
         const myIndex = game.players.findIndex(p => p.isMe);
         const me = myIndex !== -1 ? game.players[myIndex] : null;
         const turnKey = `${game.roundNumber}_${game.phase}_${game.turnIndex}_${Boolean(game.pendingSideShow)}`;
@@ -2971,6 +4087,7 @@
           if (game.phase === "playing" && me && game.turnIndex === myIndex && !game.pendingSideShow) {
             client.turnGuardUntil = Date.now() + 300;
             haptic(18);
+            SoundFX.playTurn();
           } else {
             client.turnGuardUntil = 0;
           }
@@ -3023,7 +4140,13 @@
           const isDealer = game.dealerIndex === myIndex;
           const isWinner = me.status === "winner";
           const isPacked = me.status === "packed";
-          const isFaceUp = (game.phase === "showdown" || me.status === "seen") && me.cards[0] !== null;
+          const hasCardsData = me.cards && me.cards[0] !== null;
+
+          // Showdown reveals all; during playing phase, show face-up only if holding corner-peek or locked open
+          const isFaceUp = hasCardsData && (
+            game.phase === "showdown" ||
+            (me.status === "seen" && (client.peekHolding || client.cardsLockedOpen))
+          );
 
           let cardWrapStyle = "silk-surface border-emerald-400/30";
           if (isWinner) cardWrapStyle = "silk-surface border-amber-400";
@@ -3037,7 +4160,7 @@
           else if (isPacked) statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-950 text-rose-300 border border-rose-500/30">PACKED</span>`;
           else if (me.status === "seen") statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/25 text-emerald-200 border border-emerald-400/45">SEEN</span>`;
 
-          const canTapCardsToSee = !isFaceUp && !isPacked && game.phase === "playing";
+          const canInteractCards = !isPacked && game.phase === "playing";
 
           if (!mySeatEl.querySelector("[data-my-seat-shell]") || isNewDeal) {
             mySeatEl.innerHTML = `
@@ -3059,10 +4182,10 @@
                 <div class="flex flex-col items-center">
                   <div
                     data-my-cards-row
-                    ${canTapCardsToSee ? `role="button" tabindex="0" onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"` : ""}
-                    class="${canTapCardsToSee ? "cursor-pointer" : ""} flex items-center justify-center gap-3 sm:gap-4 py-1"
+                    oncontextmenu="return false"
+                    class="select-none flex items-center justify-center gap-3 sm:gap-4 py-1"
                   ></div>
-                  <div data-my-hand-footer class="mt-3 min-h-[28px] flex items-center justify-center"></div>
+                  <div data-my-hand-footer class="mt-3 min-h-[32px] flex flex-wrap items-center justify-center gap-2"></div>
                 </div>
               </div>
             `;
@@ -3078,49 +4201,106 @@
             }
             const statusEl = shell.querySelector("[data-my-status]");
             if (statusEl) statusEl.innerHTML = statusTag;
-
-            const cardsRow = shell.querySelector("[data-my-cards-row]");
-            if (cardsRow) {
-              if (canTapCardsToSee) {
-                cardsRow.setAttribute("role", "button");
-                cardsRow.setAttribute("tabindex", "0");
-                cardsRow.setAttribute("onclick", "haptic(16); sendIntent({ type: 'SEE_CARDS' })");
-                cardsRow.classList.add("cursor-pointer");
-              } else {
-                cardsRow.removeAttribute("role");
-                cardsRow.removeAttribute("tabindex");
-                cardsRow.removeAttribute("onclick");
-                cardsRow.classList.remove("cursor-pointer");
-              }
-            }
           }
 
           const myCardsRow = mySeatEl.querySelector("[data-my-cards-row]");
-          syncCardsContainer(myCardsRow, me.cards, isFaceUp, "large", isNewDeal);
+          if (myCardsRow) {
+            if (canInteractCards) {
+              myCardsRow.onpointerdown = handleCornerPeekDown;
+              myCardsRow.classList.add("cursor-pointer");
+            } else {
+              myCardsRow.onpointerdown = null;
+              myCardsRow.classList.remove("cursor-pointer");
+            }
+            syncCardsContainer(myCardsRow, me.cards, isFaceUp, "large", isNewDeal, triggerDramaticSqueeze);
+          }
 
           const myFooter = mySeatEl.querySelector("[data-my-hand-footer]");
           if (myFooter) {
+            let footerHtml = "";
+
+            // Hand Name + Strength Hint Pill when cards are currently visible
             if (isFaceUp && me.handName) {
-              myFooter.innerHTML = `
+              const tier = client.showHandHint ? getHandStrengthTier(me.handCat) : null;
+              const tierPrefix = tier ? `<span class="${tier.tone} font-black">${tier.label} • </span>` : "";
+              footerHtml += `
                 <div class="px-3.5 py-1 rounded-xl silk-inset border border-amber-400/40 text-xs font-extrabold text-amber-300">
-                  ${esc(me.handName)}
+                  ${tierPrefix}${esc(me.handName)}
                 </div>
               `;
-            } else if (canTapCardsToSee) {
-              myFooter.innerHTML = `
-                <div
-                  role="button"
-                  tabindex="0"
-                  onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
-                  class="btn-div px-4 py-1.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/45 text-amber-300 text-xs font-extrabold"
-                >
-                  See Cards
-                </div>
-              `;
-            } else {
-              myFooter.innerHTML = "";
             }
+
+            if (canInteractCards) {
+              if (me.status === "blind") {
+                footerHtml += `
+                  <div
+                    onpointerdown="handleCornerPeekDown(event)"
+                    oncontextmenu="return false"
+                    class="btn-div px-3.5 py-1.5 rounded-xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-400/45 text-amber-300 text-xs font-extrabold"
+                  >
+                    Hold Cards to Peek
+                  </div>
+                  <div
+                    role="button"
+                    tabindex="0"
+                    onclick="toggleCardsLockedOpen()"
+                    class="btn-div px-3 py-1.5 rounded-xl silk-inset hover:border-emerald-400/45 text-emerald-200 text-xs font-bold"
+                  >
+                    See &amp; Lock Open
+                  </div>
+                `;
+              } else if (me.status === "seen") {
+                footerHtml += `
+                  <div
+                    onpointerdown="handleCornerPeekDown(event)"
+                    oncontextmenu="return false"
+                    class="btn-div px-3 py-1.5 rounded-xl silk-inset hover:border-amber-400/45 text-amber-200 text-xs font-bold"
+                  >
+                    Hold to Peek
+                  </div>
+                  <div
+                    role="button"
+                    tabindex="0"
+                    onclick="toggleCardsLockedOpen()"
+                    class="btn-div px-3 py-1.5 rounded-xl ${client.cardsLockedOpen ? "bg-emerald-500/20 border border-emerald-400/50 text-emerald-200" : "silk-inset text-emerald-100"} text-xs font-bold"
+                  >
+                    ${client.cardsLockedOpen ? "Hide Cards" : "Lock Face-Up"}
+                  </div>
+                `;
+              }
+            }
+
+            myFooter.innerHTML = footerHtml;
           }
+        } else if (game.spectatorMe) {
+          // Spectator Mode Banner Card
+          const spec = game.spectatorMe;
+          mySeatEl.innerHTML = `
+            <div class="rounded-3xl silk-surface border border-sky-400/45 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-400/45 text-sky-300 flex items-center justify-center text-lg font-black shrink-0">
+                  👁
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-display text-lg font-extrabold text-white">${esc(spec.name)}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-sky-500/25 text-sky-200 text-[10px] font-black uppercase border border-sky-400/40">Spectator</span>
+                  </div>
+                  <p class="text-xs text-emerald-200/80 mt-0.5">
+                    ${spec.queued ? "Queued — You will be dealt into the next round automatically!" : "Watching live table. Tap below to join the next round."}
+                  </p>
+                </div>
+              </div>
+              <div
+                role="button"
+                tabindex="0"
+                onclick="haptic(14); sendIntent({ type: 'SPECTATOR_TOGGLE_QUEUE' })"
+                class="btn-div px-4 py-2.5 rounded-2xl ${spec.queued ? "bg-emerald-500/25 border border-emerald-400/60 text-emerald-200" : "bg-gradient-to-r from-sky-400 to-amber-400 text-felt-950"} font-black text-xs"
+              >
+                ${spec.queued ? "✓ Queued for Next Round" : "Join Next Round"}
+              </div>
+            </div>
+          `;
         } else {
           mySeatEl.innerHTML = "";
         }
@@ -3132,7 +4312,7 @@
 
         if (isNewDeal || oppGrid.querySelectorAll("[data-opp-id]").length !== opponents.length) {
           oppGrid.innerHTML = opponents.map(({ p }) => `
-            <div data-opp-id="${esc(p.id)}" class="opp-silk-card rounded-2xl border p-3 silk-surface">
+            <div data-opp-id="${esc(p.id)}" class="opp-silk-card relative rounded-2xl border p-3 silk-surface">
               <div data-opp-turn-strip class="hidden mb-2 px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-300 to-amber-500 text-felt-950 text-[10px] font-black uppercase tracking-wider text-center">
                 Playing Now
               </div>
@@ -3141,6 +4321,7 @@
                   <div class="flex items-center gap-1">
                     <span data-opp-dealer class="hidden w-4 h-4 rounded-full bg-amber-400 text-felt-950 font-black text-[9px] flex items-center justify-center shrink-0">D</span>
                     <span class="font-bold text-xs sm:text-sm text-white truncate">${esc(p.name)}</span>
+                    ${p.isBot ? `<span class="px-1.5 py-0.2 rounded bg-amber-400/15 text-amber-300 text-[9px] font-black uppercase shrink-0">AI</span>` : ""}
                   </div>
                   <div data-opp-net class="text-[11px] font-bold text-emerald-200/75"></div>
                 </div>
@@ -3167,7 +4348,7 @@
           else if (isTurn) wrap = "silk-surface border-2 border-amber-400 turn-glow";
           else if (isPacked) wrap = "silk-inset border-slate-700/55 opacity-60";
 
-          cardEl.className = `opp-silk-card rounded-2xl border p-3 ${wrap}`;
+          cardEl.className = `opp-silk-card relative rounded-2xl border p-3 ${wrap}`;
 
           const turnStrip = cardEl.querySelector("[data-opp-turn-strip]");
           if (turnStrip) turnStrip.classList.toggle("hidden", !isTurn);
@@ -3191,13 +4372,24 @@
           if (badgeEl) badgeEl.innerHTML = badge;
 
           const cardsRow = cardEl.querySelector("[data-opp-cards-row]");
-          syncCardsContainer(cardsRow, p.cards, showOppCards, "compact", isNewDeal);
+          syncCardsContainer(cardsRow, p.cards, showOppCards, "compact", isNewDeal, triggerDramaticSqueeze);
 
           const handEl = cardEl.querySelector("[data-opp-hand]");
           if (handEl) {
-            handEl.innerHTML = showOppCards && p.handName
-              ? `<span class="inline-block px-2 py-0.5 rounded-lg silk-inset text-[10px] font-bold text-amber-300">${esc(p.handName)}</span>`
-              : "";
+            if (showOppCards && p.handName) {
+              if (triggerDramaticSqueeze) {
+                handEl.innerHTML = `<span class="opacity-0 transition-opacity duration-300 inline-block px-2 py-0.5 rounded-lg silk-inset text-[10px] font-bold text-amber-300">${esc(p.handName)}</span>`;
+                const t = setTimeout(() => {
+                  const sp = handEl.querySelector("span");
+                  if (sp) sp.classList.remove("opacity-0");
+                }, 1250);
+                client.squeezeTimers.push(t);
+              } else {
+                handEl.innerHTML = `<span class="inline-block px-2 py-0.5 rounded-lg silk-inset text-[10px] font-bold text-amber-300">${esc(p.handName)}</span>`;
+              }
+            } else {
+              handEl.innerHTML = "";
+            }
           }
         });
 
@@ -3214,7 +4406,7 @@
 
         if (game.phase === "showdown") {
           const isHost = client.role === "host";
-          const revealLocked = client.showdownRevealedAt && Date.now() - client.showdownRevealedAt < 2200;
+          const revealLocked = client.showdownRevealedAt && Date.now() - client.showdownRevealedAt < 2300;
 
           if (isHost) {
             bar.innerHTML = `
@@ -3273,6 +4465,25 @@
           return;
         }
 
+        // Spectator Action Dock
+        if (!me && game.spectatorMe) {
+          const spec = game.spectatorMe;
+          bar.innerHTML = `
+            <div class="flex items-center gap-3 py-0.5">
+              <span class="text-xs font-bold text-sky-200">👁 Watching Live</span>
+              <div
+                role="button"
+                tabindex="0"
+                onclick="haptic(14); sendIntent({ type: 'SPECTATOR_TOGGLE_QUEUE' })"
+                class="btn-div px-4 py-2 rounded-xl ${spec.queued ? "bg-emerald-500/25 border border-emerald-400/60 text-emerald-200" : "bg-gradient-to-r from-sky-400 to-amber-400 text-felt-950"} font-black text-xs"
+              >
+                ${spec.queued ? "✓ Queued for Next Round" : "Join Next Round"}
+              </div>
+            </div>
+          `;
+          return;
+        }
+
         const activeTurn = game.players[game.turnIndex];
         if (!activeTurn) return;
 
@@ -3286,7 +4497,7 @@
               <div
                 role="button"
                 tabindex="0"
-                onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
+                onclick="haptic(16); toggleCardsLockedOpen()"
                 class="btn-div ml-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-bold text-xs"
               >
                 See Cards
@@ -3299,7 +4510,6 @@
         const activeList = game.players.filter(p => p.status === "blind" || p.status === "seen");
         const isBlind = me.status === "blind";
         const callAmt = isBlind ? game.currentStake : game.currentStake * 2;
-        const raiseAmt = callAmt * 2;
         const guardAttr = client.turnGuardUntil && Date.now() < client.turnGuardUntil ? 'data-disabled="true"' : "";
 
         let nextActive = null;
@@ -3319,6 +4529,7 @@
           nextActive &&
           nextActive.status === "seen";
 
+        // Show is ONLY allowed when exactly 2 active players remain (Blind calls with Blind amt; Seen calls with Chaal amt)
         const canShow = activeList.length === 2;
 
         bar.innerHTML = `
@@ -3326,7 +4537,7 @@
             <div
               role="button"
               tabindex="0"
-              onclick="haptic(16); sendIntent({ type: 'SEE_CARDS' })"
+              onclick="haptic(16); toggleCardsLockedOpen()"
               class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold text-xs sm:text-sm"
             >
               See Cards
@@ -3337,20 +4548,10 @@
             role="button"
             tabindex="0"
             ${guardAttr}
-            onclick="haptic(14); sendIntent({ type: 'BET', mult: 1 })"
-            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-xs sm:text-sm"
+            onclick="haptic(14); sendIntent({ type: 'BET' })"
+            class="btn-div px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-xs sm:text-sm"
           >
             ${isBlind ? "Blind" : "Chaal"} ${rs(callAmt)}
-          </div>
-
-          <div
-            role="button"
-            tabindex="0"
-            ${guardAttr}
-            onclick="haptic(18); sendIntent({ type: 'BET', mult: 2 })"
-            class="btn-div px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-felt-950 font-extrabold text-xs sm:text-sm"
-          >
-            2× ${rs(raiseAmt)}
           </div>
 
           ${canSideShow ? `
@@ -3389,49 +4590,86 @@
         `;
       }
 
+      /* Dramatic Card-by-Card Reveal inside Side Show Modal */
       function renderSideShowResultModal(data) {
         const headline = document.getElementById("sideShowResultHeadline");
-        headline.textContent = data.iWon
-          ? `You Beat ${data.theirName}!`
-          : `${data.theirName} Beat You`;
+        headline.textContent = "Revealing Cards...";
 
         const myBox = document.getElementById("ssMyBox");
         const myBadge = document.getElementById("ssMyOutcomeBadge");
+        const myHandLbl = document.getElementById("ssMyHandLabel");
         const theirBox = document.getElementById("ssTheirBox");
         const theirTitle = document.getElementById("ssTheirTitle");
         const theirBadge = document.getElementById("ssTheirOutcomeBadge");
+        const theirHandLbl = document.getElementById("ssTheirHandLabel");
 
-        if (data.iWon) {
-          myBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset";
-          myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950";
-          myBadge.textContent = "YOU WON";
-
-          theirBox.className = "rounded-2xl border-2 border-rose-500/45 p-4 silk-inset opacity-85";
-          theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200";
-          theirBadge.textContent = "PACKED";
-        } else {
-          myBox.className = "rounded-2xl border-2 border-rose-500/55 p-4 silk-inset opacity-90";
-          myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200";
-          myBadge.textContent = "YOU PACKED";
-
-          theirBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset";
-          theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950";
-          theirBadge.textContent = "WON";
-        }
+        myBox.className = "rounded-2xl border-2 border-emerald-400/35 p-4 silk-inset transition-all duration-300";
+        theirBox.className = "rounded-2xl border-2 border-sky-400/35 p-4 silk-inset transition-all duration-300";
+        myBadge.classList.add("opacity-0");
+        theirBadge.classList.add("opacity-0");
+        myHandLbl.classList.add("opacity-0");
+        theirHandLbl.classList.add("opacity-0");
 
         theirTitle.textContent = `${data.theirName}'s Cards`;
+        myHandLbl.textContent = data.myHandName || "";
+        theirHandLbl.textContent = data.theirHandName || "";
 
-        document.getElementById("ssMyCardsRow").innerHTML = (data.myCards || [])
-          .map((c, idx) => renderFlipCard(c, true, "compact", idx, false))
-          .join("");
-        document.getElementById("ssMyHandLabel").textContent = data.myHandName || "";
+        const myRow = document.getElementById("ssMyCardsRow");
+        const theirRow = document.getElementById("ssTheirCardsRow");
 
-        document.getElementById("ssTheirCardsRow").innerHTML = (data.theirCards || [])
-          .map((c, idx) => renderFlipCard(c, true, "compact", idx, false))
+        // Render face-down initially
+        myRow.innerHTML = (data.myCards || [])
+          .map((c, idx) => renderFlipCard(c, false, "compact", idx, false))
           .join("");
-        document.getElementById("ssTheirHandLabel").textContent = data.theirHandName || "";
+        theirRow.innerHTML = (data.theirCards || [])
+          .map((c, idx) => renderFlipCard(c, false, "compact", idx, false))
+          .join("");
 
         document.getElementById("sideShowResultModal").classList.remove("hidden");
+
+        // Staggered card-by-card flip (0ms -> 150ms, 550ms, 1150ms)
+        const myFlippers = myRow.querySelectorAll(".card-flipper");
+        const theirFlippers = theirRow.querySelectorAll(".card-flipper");
+        const delays = [150, 550, 1150];
+
+        delays.forEach((delay, idx) => {
+          setTimeout(() => {
+            if (data.myCards && data.myCards[idx]) {
+              flipSingleCardEl(myFlippers[idx], data.myCards[idx], "compact", idx === 2);
+            }
+            if (data.theirCards && data.theirCards[idx]) {
+              flipSingleCardEl(theirFlippers[idx], data.theirCards[idx], "compact", idx === 2);
+            }
+          }, delay);
+        });
+
+        // Reveal verdict right as the 3rd card lands
+        setTimeout(() => {
+          headline.textContent = data.iWon
+            ? `You Beat ${data.theirName}!`
+            : `${data.theirName} Beat You`;
+
+          if (data.iWon) {
+            myBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset transition-all duration-300";
+            myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950 transition-opacity duration-300";
+            myBadge.textContent = "YOU WON";
+
+            theirBox.className = "rounded-2xl border-2 border-rose-500/45 p-4 silk-inset opacity-85 transition-all duration-300";
+            theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200 transition-opacity duration-300";
+            theirBadge.textContent = "PACKED";
+          } else {
+            myBox.className = "rounded-2xl border-2 border-rose-500/55 p-4 silk-inset opacity-90 transition-all duration-300";
+            myBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-900 text-rose-200 transition-opacity duration-300";
+            myBadge.textContent = "YOU PACKED";
+
+            theirBox.className = "rounded-2xl border-2 border-emerald-400 p-4 silk-inset transition-all duration-300";
+            theirBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-felt-950 transition-opacity duration-300";
+            theirBadge.textContent = "WON";
+          }
+
+          myHandLbl.classList.remove("opacity-0");
+          theirHandLbl.classList.remove("opacity-0");
+        }, 1220);
       }
 
       function closeSideShowResultModal() {
@@ -3441,6 +4679,71 @@
       function answerSideShow(accept) {
         document.getElementById("sideShowModal").classList.add("hidden");
         sendIntent({ type: "SIDE_SHOW_ANSWER", accept });
+      }
+
+      /* Round-by-Round Hisab Drawer (No Per-Player Delta Breakdown, No Mid-Session Snapshot Copy) */
+      function openHisabDrawer() {
+        renderHisabDrawerContent();
+        document.getElementById("hisabDrawerOverlay").classList.remove("hidden");
+      }
+
+      function closeHisabDrawer() {
+        document.getElementById("hisabDrawerOverlay").classList.add("hidden");
+      }
+
+      function renderHisabDrawerContent() {
+        const standingsEl = document.getElementById("hisabStandingsList");
+        const roundsEl = document.getElementById("hisabRoundsList");
+        const totalBadge = document.getElementById("hisabRoundTotalBadge");
+
+        const playersSource = (client.game && client.game.players)
+          || (client.settlement && client.settlement.standings)
+          || [];
+        const logSource = (client.game && client.game.hisabLog)
+          || (client.settlement && client.settlement.hisabLog)
+          || [];
+
+        const sortedPlayers = [...playersSource].sort((a, b) => (b.net || 0) - (a.net || 0));
+        standingsEl.innerHTML = sortedPlayers.map(p => {
+          const net = p.net || 0;
+          const clr = net > 0 ? "text-emerald-400" : net < 0 ? "text-rose-400" : "text-slate-300";
+          return `
+            <div class="rounded-xl silk-inset px-3.5 py-2 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="font-bold text-xs sm:text-sm text-white truncate">${esc(p.name)}</span>
+                <span class="text-[11px] text-emerald-200/60 shrink-0">${p.handsWon || 0} won</span>
+              </div>
+              <span class="font-black text-xs sm:text-sm ${clr} shrink-0">${signedRs(net)}</span>
+            </div>
+          `;
+        }).join("");
+
+        totalBadge.textContent = `${logSource.length} Round${logSource.length === 1 ? "" : "s"}`;
+
+        if (logSource.length === 0) {
+          roundsEl.innerHTML = `
+            <div class="rounded-2xl silk-inset p-5 text-center text-xs font-semibold text-emerald-200/70">
+              No completed hands yet. Finished rounds will appear here automatically.
+            </div>
+          `;
+          return;
+        }
+
+        roundsEl.innerHTML = logSource.map(entry => `
+          <div class="rounded-2xl silk-inset border border-emerald-400/20 p-3.5 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/35 text-amber-300 text-[11px] font-black">
+                Round #${entry.roundNumber}
+              </span>
+              <span class="text-xs font-black text-amber-400">
+                Pot: ${rs(entry.pot)}
+              </span>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-white">
+              <span class="text-emerald-300">${esc(entry.winnerNames)}</span> won with <span class="text-amber-200">${esc(entry.winReason)}</span>
+            </div>
+          </div>
+        `).join("");
       }
 
       function openSettleConfirmModal() {
@@ -3467,6 +4770,11 @@
       function renderSettlement() {
         const report = client.settlement;
         if (!report) return;
+
+        const hisabBadge = document.getElementById("headerHisabCountBadge");
+        if (hisabBadge) {
+          hisabBadge.textContent = String((report.hisabLog || []).length);
+        }
 
         document.getElementById("settlementMetaSubtitle").textContent =
           `${report.roundsPlayed} Round${report.roundsPlayed === 1 ? "" : "s"} Completed`;
@@ -3586,14 +4894,39 @@
       });
 
       document.addEventListener("keydown", e => {
-        if (e.key === "Escape") closeHeaderMenu();
+        if (e.key === "Escape") {
+          closeHeaderMenu();
+          closeHisabDrawer();
+        }
       });
 
       window.matchMedia("(min-width: 640px)").addEventListener("change", e => {
         if (e.matches) closeHeaderMenu();
       });
 
+      function syncHandHintButtonUI() {
+        const btn = document.getElementById("btnToggleHandHint");
+        if (!btn) return;
+        if (client.showHandHint) {
+          btn.textContent = "ON";
+          btn.className = "btn-div px-3.5 py-2 rounded-xl bg-emerald-500/25 border border-emerald-400/50 text-emerald-200 font-black text-xs";
+        } else {
+          btn.textContent = "OFF";
+          btn.className = "btn-div px-3.5 py-2 rounded-xl silk-inset text-emerald-200/60 font-black text-xs";
+        }
+      }
+
+      function toggleHandHintSetting() {
+        client.showHandHint = !client.showHandHint;
+        try {
+          localStorage.setItem(HAND_HINT_KEY, client.showHandHint ? "1" : "0");
+        } catch (e) {}
+        syncHandHintButtonUI();
+        if (client.game) renderGame();
+      }
+
       function openRulesModal() {
+        syncHandHintButtonUI();
         document.getElementById("rulesModal").classList.remove("hidden");
       }
 
@@ -3602,32 +4935,35 @@
       }
 
       window.addEventListener("DOMContentLoaded", () => {
+        SoundFX.init();
+        try {
+          const savedHint = localStorage.getItem(HAND_HINT_KEY);
+          if (savedHint === "0") client.showHandHint = false;
+        } catch (e) {}
+        syncHandHintButtonUI();
+
         try {
           const params = new URLSearchParams(window.location.search);
           const urlRoom = (params.get("room") || "").trim().toUpperCase();
           const hostBackup = loadHostBackup();
 
-          // Check if this browser is the Host of a saved session (including when Host refreshed with ?room=CODE in URL)
           if (hostBackup && (!urlRoom || hostBackup.roomCode === urlRoom)) {
             if (urlRoom && hostBackup.roomCode === urlRoom) {
-              // Seamless auto-resume when Host reloads their active table URL
               resumeSavedHostTable();
               return;
             }
-            // Otherwise present the one-tap Resume Hosted Table card on the landing screen
             const banner = document.getElementById("hostResumeBanner");
             document.getElementById("hostResumeTitle").textContent = `Resume Table ${hostBackup.roomCode}`;
             const statusDesc = hostBackup.started
               ? `${hostBackup.players.length} players • Round #${hostBackup.roundNumber}`
               : `${hostBackup.players.length}/${hostBackup.totalPlayers} joined in Lobby`;
-            document.getElementById("hostResumeSubtext").textContent = `${statusDesc} • Bet ${rs(hostBackup.betAmount)}`;
+            document.getElementById("hostResumeSubtext").textContent = `${statusDesc} • Blind ${rs(hostBackup.betAmount)}`;
             banner.classList.remove("hidden");
             showScreen("setup");
             switchLandingMode("create");
             return;
           }
 
-          // Check URL ?room= param or saved guest session for seamless guest reconnect
           const targetGuestRoom = urlRoom || getGuestSavedRoom();
           if (targetGuestRoom) {
             connectGuestToRoom(targetGuestRoom);
