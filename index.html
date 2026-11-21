@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <title>फलास</title>
-    <meta name="description" content="Play authentic Nepali फलास (Falas) card game online free with friends or AI bots. Real-time peer-to-peer multiplayer with Blind, Chaal, Side Show, Trial, Double Run, Jut, Muflis, AK47, and instant Hisab settlement." />
+    <meta name="description" content="Play authentic Nepali फलास card game online free with friends or AI bots. Real-time peer-to-peer multiplayer with Blind, Chaal, Side Show, Trial, Double Run, Jut, Muflis, AK47, and instant Hisab settlement." />
     <meta name="keywords" content="फलास, Falas, Falas card game, Nepali card game, Nepali Falas online, Teen Patti Nepal, तास, नेपाली तास खेल, Jut Patti, Trial Double Run Jut, Blind Chaal Side Show, multiplayer card game Nepal, Falas Hisab" />
-    <meta name="author" content="फलास (Falas)" />
+    <meta name="author" content="फलास" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#02110c" />
@@ -25,18 +25,18 @@
 
     <!-- Open Graph / Social Search Rich Preview -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="फलास (Falas)" />
-    <meta property="og:title" content="फलास (Falas) — Online Multiplayer Nepali Card Game" />
+    <meta property="og:site_name" content="फलास" />
+    <meta property="og:title" content="फलास" />
     <meta property="og:description" content="Create a private table or play vs bots. Authentic Nepali Falas with Blind, Chaal, instant Side Show comparison, zero-leak privacy, and automatic Hisab settlement." />
     <meta property="og:image" content="favicon.png" />
-    <meta property="og:image:alt" content="फलास Nepali Multiplayer Card Game" />
+    <meta property="og:image:alt" content="फलास" />
     <meta property="og:locale" content="ne_NP" />
     <meta property="og:locale:alternate" content="en_US" />
 
     <!-- Twitter / X Search Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="फलास (Falas) — Online Multiplayer Nepali Card Game" />
-    <meta name="twitter:description" content="Play authentic Nepali फलास (Falas) live with friends. Instant Side Show comparison, private cards, and automatic Hisab settlement." />
+    <meta name="twitter:title" content="फलास" />
+    <meta name="twitter:description" content="Play authentic Nepali फलास live with friends. Instant Side Show comparison, private cards, and automatic Hisab settlement." />
     <meta name="twitter:image" content="favicon.png" />
 
     <!-- Primary Favicon & Touch Icons linked directly to favicon.png -->
@@ -53,7 +53,7 @@
       "@graph": [
         {
           "@type": "WebApplication",
-          "name": "फलास (Falas)",
+          "name": "फलास",
           "alternateName": ["Falas", "Falas Card Game", "Nepali Falas", "फलास तास"],
           "applicationCategory": "GameApplication",
           "genre": "Card Game",
@@ -91,7 +91,7 @@
               "name": "How do Blind, Chaal, and Side Show work in Falas?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Blind players bet 1x the current stake without looking at their cards, while Seen players bet 2x (Chaal). When 3 or more players remain, a Seen player may request a Side Show with an adjacent Seen player; if accepted, both compare hands privately and the lower hand packs."
+                "text": "Blind players bet 1x the standard stake without looking at their cards, while Seen players bet 2x (Chaal). When 3 or more players remain, a Seen player may request a Side Show with an adjacent Seen player; if accepted, both compare hands privately and the lower hand packs."
               }
             }
           ]
@@ -886,7 +886,7 @@
 
   <body class="antialiased selection:bg-amber-400 selection:text-felt-950 pb-32 relative">
     <!-- Semantic Primary Heading for Search Engines -->
-    <h1 class="sr-only">फलास (Falas) — Online Multiplayer Nepali Card Game</h1>
+    <h1 class="sr-only">फलास</h1>
 
     <!-- Flying Chip & Pot Sweep Animation Layer -->
     <div id="flyingChipLayer" class="fixed inset-0 pointer-events-none z-40 overflow-hidden"></div>
@@ -916,7 +916,10 @@
           <div id="headerRoomPill" role="button" tabindex="0" onclick="haptic(12); copyOrShareInviteLink()" title="Copy / Share Invite Link" class="hidden btn-div items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl silk-inset border border-amber-400/35 text-xs">
             <span id="headerConnDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span id="headerRoomCode" class="font-black tracking-widest text-amber-300">----</span>
-            <span class="text-[10px] text-amber-200/75">⧉</span>
+            <svg class="w-3.5 h-3.5 text-amber-200/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
           </div>
 
           <div id="btnHeaderHisab" role="button" tabindex="0" onclick="haptic(12); SoundFX.unlock(); openHisabDrawer()" class="hidden btn-div px-2.5 sm:px-3 py-1.5 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 text-xs font-extrabold flex items-center gap-1.5">
@@ -925,7 +928,11 @@
           </div>
 
           <div id="btnFullScreenToggle" role="button" tabindex="0" onclick="haptic(10); toggleAppFullScreen()" aria-label="Full Screen" title="Full Screen" class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-emerald-200 hover:text-amber-300 font-extrabold text-sm flex items-center justify-center">
-            <span id="fullScreenToggleIcon" aria-hidden="true">⛶</span>
+            <span id="fullScreenToggleIcon" aria-hidden="true" class="flex items-center justify-center">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+            </span>
           </div>
 
           <div id="headerMenuToggle" role="button" tabindex="0" aria-label="Menu" aria-controls="headerMenu" aria-expanded="false" onclick="haptic(10); toggleHeaderMenu()" class="btn-div w-10 h-10 rounded-xl silk-inset text-amber-300 flex items-center justify-center">
@@ -948,7 +955,7 @@
             </div>
 
             <div id="btnSoundToggle" role="button" tabindex="0" onclick="haptic(10); SoundFX.toggleMute()" aria-label="Sound" class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 font-extrabold text-sm flex items-center justify-center">
-              <span id="soundToggleIcon" aria-hidden="true">🔊</span>
+              <span id="soundToggleIcon" aria-hidden="true" class="flex items-center justify-center"></span>
               <span id="soundToggleLabel" class="header-menu-label" aria-hidden="true">Sound On</span>
             </div>
 
@@ -957,9 +964,13 @@
               <span class="header-menu-label" aria-hidden="true" data-i18n="rules">Rules</span>
             </div>
 
-            <div id="btnHeaderLeave" role="button" tabindex="0" onclick="haptic(12); closeHeaderMenu(); leaveCurrentTable()" aria-label="Leave Table" title="Leave Table" class="hidden btn-div px-2.5 h-9 rounded-xl silk-inset hover:border-rose-400/50 text-rose-300 font-extrabold text-xs items-center justify-center gap-1">
-              <span>↩</span>
-              <span class="header-menu-label">Leave Table</span>
+            <div id="btnHeaderLeave" role="button" tabindex="0" onclick="haptic(12); closeHeaderMenu(); leaveCurrentTable()" aria-label="Leave Table" title="Leave Table" class="hidden btn-div px-2.5 h-9 rounded-xl silk-inset hover:border-rose-400/50 text-rose-300 font-extrabold text-xs items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Leave</span>
             </div>
           </div>
         </div>
@@ -1059,9 +1070,20 @@
               role="button"
               tabindex="0"
               onclick="haptic(10); toggleAdvancedRulesPanel()"
-              class="btn-div px-3 py-1.5 rounded-xl silk-surface border border-emerald-400/30 text-emerald-200 text-xs font-extrabold flex items-center gap-1"
+              aria-label="House Rules"
+              class="btn-div px-3 py-1.5 rounded-xl silk-surface border border-emerald-400/30 text-emerald-200 text-xs font-extrabold flex items-center gap-1.5"
             >
-              <span>⚙</span>
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
               <span id="advancedRulesChevron">▾</span>
             </div>
           </div>
@@ -1315,7 +1337,7 @@
                 MUFLIS
               </span>
               <span id="spectatorCountPill" class="hidden px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-sky-500/20 text-sky-200 border border-sky-400/40">
-                👁 1
+                Watching: 1
               </span>
               <span id="turnTimerBadge" class="hidden px-2 py-0.5 rounded-lg text-[11px] font-black tabular-nums bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">
                 25s
@@ -1407,13 +1429,11 @@
 
     <!-- Compact Quick Reaction Palette -->
     <div id="reactionPickerPopup" class="hidden fixed bottom-16 left-3 sm:left-6 z-40 rounded-2xl silk-surface border border-amber-400/40 p-2 flex flex-wrap items-center gap-1.5 max-w-[92vw] shadow-2xl animate-view">
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('🔥')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-sm font-bold">🔥</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('😱')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-sm font-bold">😱</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('😂')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-sm font-bold">😂</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('👏')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-sm font-bold">👏</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('Blind नै हो!')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-amber-300">Blind नै हो!</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('चोर्यो!')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-emerald-200">चोर्यो!</div>
-      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('खतरनाक!')" class="btn-div px-2.5 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-rose-200">खतरनाक!</div>
+      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('Blind नै हो!')" class="btn-div px-3 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-amber-300">Blind नै हो!</div>
+      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('चोर्यो!')" class="btn-div px-3 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-emerald-200">चोर्यो!</div>
+      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('खतरनाक!')" class="btn-div px-3 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-rose-200">खतरनाक!</div>
+      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('राम्रो पत्ती!')" class="btn-div px-3 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-sky-200">राम्रो पत्ती!</div>
+      <div role="button" tabindex="0" onclick="haptic(10); sendQuickReaction('Show गरौं!')" class="btn-div px-3 py-1.5 rounded-xl silk-inset text-xs font-extrabold text-purple-200">Show गरौं!</div>
     </div>
 
     <!-- Two-Zone Bottom Action Dock -->
@@ -1849,7 +1869,11 @@
         updateIcon() {
           const icon = document.getElementById("soundToggleIcon");
           const label = document.getElementById("soundToggleLabel");
-          if (icon) icon.textContent = this.muted ? "🔇" : "🔊";
+          if (icon) {
+            icon.innerHTML = this.muted
+              ? `<svg class="w-4 h-4 text-rose-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`
+              : `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+          }
           if (label) label.textContent = this.muted ? "Muted" : "Sound On";
         },
         tone(freq, dur = 0.14, type = "sine", gainVal = 0.08, delay = 0) {
@@ -1960,11 +1984,7 @@
           if (key === "b" || e.key === " ") {
             e.preventDefault();
             haptic(14);
-            sendIntent({ type: "BET", raise: false });
-          } else if (key === "r") {
-            e.preventDefault();
-            haptic(16);
-            sendIntent({ type: "BET", raise: true });
+            sendIntent({ type: "BET" });
           } else if (key === "x") {
             e.preventDefault();
             handlePackButtonClick();
@@ -2111,7 +2131,7 @@
           const cand = evaluateNaturalFalasHand([naturals[0], naturals[1], ALL_52_CARDS[i]]);
           if (!best || cand.score > best.score) best = cand;
         }
-        return { ...best, label: best.label + " ★" };
+        return { ...best, label: best.label + " (Wild)" };
       }
 
       function compareHandsForWinner(challengerEval, defenderEval, variant) {
@@ -2954,7 +2974,7 @@
       function performSeeCards(player) {
         if (player.status === "blind") {
           player.status = "seen";
-          host.latestFeed = `👁 ${player.name} saw their cards`;
+          host.latestFeed = `${player.name} saw their cards`;
           hostSyncAll();
         }
       }
@@ -2988,25 +3008,17 @@
         hostSyncAll();
       }
 
-      function performBet(player, isRaise = false) {
+      function performBet(player) {
         const isBlind = player.status === "blind";
         if (isBlind && host.maxBlindTurns > 0 && (player.blindTurnsCount || 0) >= host.maxBlindTurns) {
           return;
-        }
-        const maxStakeCap = host.betAmount * 16;
-        if (isRaise && host.currentStake < maxStakeCap) {
-          host.currentStake = Math.min(maxStakeCap, host.currentStake * 2);
-        } else {
-          isRaise = false;
         }
 
         const amount = isBlind ? host.currentStake : host.currentStake * 2;
         if (isBlind) player.blindTurnsCount = (player.blindTurnsCount || 0) + 1;
         player.net -= amount;
         host.pot += amount;
-        host.latestFeed = isRaise
-          ? `${player.name} • Raised 2x ${rs(amount)}`
-          : `${player.name} • ${isBlind ? "Blind" : "Chaal"} ${rs(amount)}`;
+        host.latestFeed = `${player.name} • ${isBlind ? "Blind" : "Chaal"} ${rs(amount)}`;
 
         if (host.potLimitMult > 0 && host.pot >= host.betAmount * host.potLimitMult) {
           triggerPotLimitAutoShowdown();
@@ -3245,7 +3257,7 @@
               return;
             }
             bot.status = "seen";
-            host.latestFeed = `👁 ${bot.name} saw their cards`;
+            host.latestFeed = `${bot.name} saw their cards`;
             hostSyncAll();
             setTimeout(() => {
               if (!host.active || host.settled || host.phase !== "playing") return;
@@ -3531,7 +3543,7 @@
         if (player.status !== "blind" && player.status !== "seen") return;
 
         if (msg.type === "BET") {
-          performBet(player, Boolean(msg.raise));
+          performBet(player);
         } else if (msg.type === "PACK") {
           performPack(player);
         } else if (msg.type === "SIDE_SHOW") {
@@ -3540,6 +3552,9 @@
           performFinalShow(player);
         }
       }
+
+      let peekPressStartedAt = 0;
+
       function startPeekHold(isTouch = false) {
         if (isTouch) {
           client.lastTouchAt = Date.now();
@@ -3550,20 +3565,53 @@
         if (!game || game.phase !== "playing") return;
         const me = game.players.find(p => p.isMe);
         if (!me || me.status === "packed") return;
-        client.peekHolding = true;
+
+        peekPressStartedAt = Date.now();
         if (me.status === "blind") {
           client.cardsLockedOpen = true;
+          client.peekHolding = false;
           SoundFX.cardFlip();
           sendIntent({ type: "SEE_CARDS" });
-        } else {
+          return;
+        }
+
+        if (!client.cardsLockedOpen) {
+          client.peekHolding = true;
           renderGameTable(false);
         }
       }
 
       function endPeekHold() {
-        if (!client.peekHolding) return;
-        client.peekHolding = false;
-        renderGameTable(false);
+        const game = client.game;
+        if (!game || game.phase !== "playing") {
+          client.peekHolding = false;
+          return;
+        }
+        const me = game.players.find(p => p.isMe);
+        if (!me || me.status !== "seen") {
+          client.peekHolding = false;
+          return;
+        }
+
+        const pressDuration = Date.now() - peekPressStartedAt;
+        if (client.cardsLockedOpen) {
+          if (pressDuration < 240) {
+            client.cardsLockedOpen = false;
+            client.peekHolding = false;
+            SoundFX.cardFlip();
+            renderGameTable(false);
+          }
+          return;
+        }
+
+        if (client.peekHolding) {
+          client.peekHolding = false;
+          if (pressDuration < 220) {
+            client.cardsLockedOpen = true;
+            SoundFX.cardFlip();
+          }
+          renderGameTable(false);
+        }
       }
 
       function handlePackButtonClick() {
@@ -3641,6 +3689,7 @@
         if (isNewDeal) {
           client.cardsLockedOpen = false;
           client.peekHolding = false;
+          client.packConfirmUntil = 0;
           client.lastSeenRound = snap.roundNumber;
           client.lastStatusSnapshot = {};
           closeSideShowRequestModal();
@@ -3665,7 +3714,7 @@
         if (newlySeenPlayers.length > 0) {
           SoundFX.opponentSeen();
           newlySeenPlayers.forEach(p => {
-            notify(`👁 ${p.name} saw their cards!`, "seen");
+            notify(`${p.name} saw their cards`, "seen");
           });
         }
 
@@ -3957,7 +4006,7 @@
         if (!seatEl) return;
         const pop = document.createElement("div");
         pop.className = "seat-seen-popup px-2.5 py-0.5 rounded-full bg-emerald-400 text-felt-950 text-[11px] font-black shadow-xl flex items-center gap-1";
-        pop.textContent = "👁 SAW CARDS";
+        pop.textContent = "SAW CARDS";
         seatEl.appendChild(pop);
         seatEl.classList.remove("opp-just-saw-flash");
         void seatEl.offsetWidth;
@@ -4216,7 +4265,7 @@
         const specPill = document.getElementById("spectatorCountPill");
         if (game.spectatorsCount > 0) {
           specPill.classList.remove("hidden");
-          specPill.textContent = `👁 ${game.spectatorsCount}`;
+          specPill.textContent = `Watching: ${game.spectatorsCount}`;
         } else {
           specPill.classList.add("hidden");
         }
@@ -4278,10 +4327,10 @@
 
           const netColor = me.net > 0 ? "text-emerald-400" : me.net < 0 ? "text-rose-400" : "text-amber-300";
 
-          let statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold silk-inset text-amber-300 border border-amber-400/30">🙈 BLIND</span>`;
+          let statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold silk-inset text-amber-300 border border-amber-400/30">BLIND</span>`;
           if (isWinner) statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-400 text-felt-950">WINNER</span>`;
           else if (isPacked) statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-950 text-rose-300 border border-rose-500/30">PACKED</span>`;
-          else if (me.status === "seen") statusTag = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/25 text-emerald-100 border border-emerald-300/60">👁 SEEN</span>`;
+          else if (me.status === "seen") statusTag = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/25 text-emerald-100 border border-emerald-300/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>SEEN</span>`;
 
           if (!mySeatEl.querySelector("[data-my-seat-shell]") || isNewDeal) {
             mySeatEl.innerHTML = `
@@ -4298,8 +4347,10 @@
                     </div>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <div role="button" tabindex="0" onclick="haptic(10); toggleReactionPicker()" aria-label="React" class="btn-div w-7 h-7 rounded-full silk-inset text-xs flex items-center justify-center">
-                      💬
+                    <div role="button" tabindex="0" onclick="haptic(10); toggleReactionPicker()" aria-label="Table Chat" class="btn-div w-7 h-7 rounded-full silk-inset text-emerald-200 flex items-center justify-center">
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
                     </div>
                     <div data-my-status>${statusTag}</div>
                   </div>
@@ -4448,13 +4499,13 @@
             netEl.textContent = signedRs(p.net);
           }
 
-          // High-clarity status badges so every user instantly sees BLIND vs 👁 SEEN
+          // High-clarity status badges so every user instantly sees BLIND vs SEEN
           let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold silk-inset text-amber-300/90 border border-amber-400/20">BLIND</span>`;
           if (isWinner) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-felt-950">WON</span>`;
           else if (isPacked) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300">PACK</span>`;
-          else if (isTurn && isSeen) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400/25 border border-amber-300/60 text-amber-200">👁 TURN</span>`;
+          else if (isTurn && isSeen) badge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400/25 border border-amber-300/60 text-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>SEEN • TURN</span>`;
           else if (isTurn) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400/20 border border-amber-400/50 text-amber-300">TURN</span>`;
-          else if (isSeen) badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/25 border border-emerald-300/60 text-emerald-100">👁 SEEN</span>`;
+          else if (isSeen) badge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400/25 border border-emerald-300/60 text-emerald-100"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>SEEN</span>`;
 
           const badgeEl = cardEl.querySelector("[data-opp-badge]");
           if (badgeEl) badgeEl.innerHTML = badge;
@@ -4624,13 +4675,10 @@
           return;
         }
 
-        // YOUR TURN — Two-Zone Thumb Dock
+        // YOUR TURN — Two-Zone Thumb Dock (Standard Blind = 1x, Chaal = 2x)
         const activeList = game.players.filter(p => p.status === "blind" || p.status === "seen");
         const isBlind = me.status === "blind";
         const callAmt = isBlind ? game.currentStake : game.currentStake * 2;
-        const maxStakeCap = game.betAmount * 16;
-        const canRaise = game.currentStake < maxStakeCap;
-        const raiseAmt = callAmt * 2;
         const guardAttr = client.turnGuardUntil && Date.now() < client.turnGuardUntil ? 'data-disabled="true"' : "";
         const blindCapReached = isBlind && game.maxBlindTurns > 0 && (me.blindTurnsCount || 0) >= game.maxBlindTurns;
         const isPackConfirming = client.packConfirmUntil && Date.now() < client.packConfirmUntil;
@@ -4668,22 +4716,11 @@
                 role="button"
                 tabindex="0"
                 ${guardAttr}
-                onclick="haptic(14); sendIntent({ type: 'BET', raise: false })"
-                class="btn-div px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
+                onclick="haptic(14); sendIntent({ type: 'BET' })"
+                class="btn-div px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
               >
                 ${isBlind ? esc(t("blind")) : esc(t("chaal"))} ${rs(callAmt)}
               </div>
-              ${canRaise ? `
-                <div
-                  role="button"
-                  tabindex="0"
-                  ${guardAttr}
-                  onclick="haptic(16); sendIntent({ type: 'BET', raise: true })"
-                  class="btn-div px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl silk-surface border border-emerald-300/45 text-emerald-200 font-black text-[11px] sm:text-xs whitespace-nowrap shrink-0"
-                >
-                  2x ${rs(raiseAmt)}
-                </div>
-              ` : ""}
             ` : ""}
           </div>
 
@@ -4924,7 +4961,11 @@
       function syncFullScreenButtonIcon() {
         const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
         const icon = document.getElementById("fullScreenToggleIcon");
-        if (icon) icon.textContent = isFs ? "🗗" : "⛶";
+        if (icon) {
+          icon.innerHTML = isFs
+            ? `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6m10-10h-6V4m0 6 7-7M3 21l7-7"></path></svg>`
+            : `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
+        }
       }
 
       document.addEventListener("fullscreenchange", syncFullScreenButtonIcon);
