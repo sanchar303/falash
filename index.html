@@ -684,6 +684,24 @@
           inset 0 1px 0 0 rgba(253, 230, 138, 0.32);
       }
 
+      .winner-silk-aura {
+        border-color: rgba(251, 191, 36, 0.95) !important;
+        background:
+          linear-gradient(135deg, rgba(251, 191, 36, 0.22) 0%, rgba(16, 185, 129, 0.14) 100%),
+          linear-gradient(155deg, rgba(13, 68, 50, 0.85) 0%, rgba(2, 17, 12, 0.96) 100%) !important;
+        box-shadow:
+          0 0 28px -2px rgba(251, 191, 36, 0.45),
+          0 18px 36px -10px rgba(0, 0, 0, 0.72),
+          inset 0 1px 0 0 rgba(254, 240, 138, 0.5);
+      }
+
+      .pack-confirm-active {
+        background: linear-gradient(145deg, #e11d48 0%, #be123c 100%) !important;
+        border-color: #fda4af !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 18px rgba(225, 29, 72, 0.45) !important;
+      }
+
       .opp-silk-card {
         transition: border-color 0.32s ease, box-shadow 0.32s ease, opacity 0.28s ease;
       }
@@ -895,9 +913,10 @@
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2">
-          <div id="headerRoomPill" class="hidden items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl silk-inset border border-amber-400/35 text-xs">
+          <div id="headerRoomPill" role="button" tabindex="0" onclick="haptic(12); copyOrShareInviteLink()" title="Copy / Share Invite Link" class="hidden btn-div items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl silk-inset border border-amber-400/35 text-xs">
             <span id="headerConnDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span id="headerRoomCode" class="font-black tracking-widest text-amber-300">----</span>
+            <span class="text-[10px] text-amber-200/75">⧉</span>
           </div>
 
           <div id="btnHeaderHisab" role="button" tabindex="0" onclick="haptic(12); SoundFX.unlock(); openHisabDrawer()" class="hidden btn-div px-2.5 sm:px-3 py-1.5 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 text-xs font-extrabold flex items-center gap-1.5">
@@ -936,6 +955,11 @@
             <div role="button" tabindex="0" onclick="haptic(10); closeHeaderMenu(); openRulesModal()" aria-label="Rules" class="btn-div w-9 h-9 rounded-xl silk-inset hover:border-amber-400/45 text-amber-300 font-extrabold text-sm flex items-center justify-center">
               <span aria-hidden="true">?</span>
               <span class="header-menu-label" aria-hidden="true" data-i18n="rules">Rules</span>
+            </div>
+
+            <div id="btnHeaderLeave" role="button" tabindex="0" onclick="haptic(12); closeHeaderMenu(); leaveCurrentTable()" aria-label="Leave Table" title="Leave Table" class="hidden btn-div px-2.5 h-9 rounded-xl silk-inset hover:border-rose-400/50 text-rose-300 font-extrabold text-xs items-center justify-center gap-1">
+              <span>↩</span>
+              <span class="header-menu-label">Leave Table</span>
             </div>
           </div>
         </div>
@@ -1198,7 +1222,7 @@
             <div>
               <span class="text-[11px] font-extrabold uppercase tracking-widest text-emerald-300">Table Code</span>
               <div class="flex items-center justify-center sm:justify-start gap-3 mt-1">
-                <h2 id="lobbyRoomCode" class="font-display text-3xl sm:text-4xl font-black tracking-widest text-amber-400">
+                <h2 id="lobbyRoomCode" role="button" tabindex="0" onclick="haptic(12); copyOrShareInviteLink()" title="Tap to copy invite link" class="cursor-pointer font-display text-3xl sm:text-4xl font-black tracking-widest text-amber-400 hover:text-amber-300 transition-colors">
                   ----
                 </h2>
                 <div
@@ -1227,14 +1251,24 @@
 
         <!-- Host Start & Bot Fill Controls -->
         <div id="lobbyHostControls" class="hidden pt-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          <div
-            id="btnHostAddBot"
-            role="button"
-            tabindex="0"
-            onclick="haptic(12); hostAddLobbyBot()"
-            class="btn-div px-4 py-3 rounded-2xl silk-inset border border-emerald-400/35 text-emerald-200 font-extrabold text-xs text-center"
-          >
-            + Add Bot
+          <div class="flex items-center gap-2">
+            <div
+              role="button"
+              tabindex="0"
+              onclick="haptic(10); leaveCurrentTable()"
+              class="btn-div px-3.5 py-3 rounded-2xl silk-inset border border-rose-400/30 text-rose-300 font-bold text-xs text-center"
+            >
+              ← Leave
+            </div>
+            <div
+              id="btnHostAddBot"
+              role="button"
+              tabindex="0"
+              onclick="haptic(12); hostAddLobbyBot()"
+              class="btn-div flex-1 sm:flex-none px-4 py-3 rounded-2xl silk-inset border border-emerald-400/35 text-emerald-200 font-extrabold text-xs text-center"
+            >
+              + Add Bot
+            </div>
           </div>
           <div
             id="btnHostStartNow"
@@ -1248,7 +1282,15 @@
         </div>
 
         <!-- Guest Waiting -->
-        <div id="lobbyGuestWait" class="hidden pt-1 text-center">
+        <div id="lobbyGuestWait" class="hidden pt-1 flex items-center justify-between gap-2">
+          <div
+            role="button"
+            tabindex="0"
+            onclick="haptic(10); leaveCurrentTable()"
+            class="btn-div px-3.5 py-2.5 rounded-2xl silk-inset border border-rose-400/30 text-rose-300 font-bold text-xs"
+          >
+            ← Leave
+          </div>
           <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl silk-inset text-xs font-bold text-emerald-200">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
             <span>Waiting for host...</span>
@@ -1875,7 +1917,14 @@
         }
       });
 
+      document.addEventListener("pointerdown", () => {
+        SoundFX.unlock();
+      }, { once: true, passive: true });
+
       document.addEventListener("keydown", e => {
+        const tag = document.activeElement?.tagName;
+        const isTyping = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
         if (e.key === "Escape") {
           closeHisabDrawer();
           closeRulesModal();
@@ -1883,9 +1932,57 @@
           closeSideShowTargetModal();
           closeSideShowResultModal();
           document.getElementById("reactionPickerPopup")?.classList.add("hidden");
-        } else if ((e.key === "Enter" || e.key === " ") && document.activeElement?.getAttribute("role") === "button") {
+          return;
+        }
+
+        if ((e.key === "Enter" || e.key === " ") && document.activeElement?.getAttribute("role") === "button") {
           e.preventDefault();
           document.activeElement.click();
+          return;
+        }
+
+        if (isTyping || !client.game || !document.body.classList.contains("is-in-game")) return;
+        const anyModalOpen = ["sideShowTargetModal", "sideShowRequestModal", "sideShowResultModal", "hisabDrawer", "rulesModal", "settleConfirmModal"]
+          .some(id => !document.getElementById(id)?.classList.contains("hidden"));
+        if (anyModalOpen) return;
+
+        const key = e.key.toLowerCase();
+        const game = client.game;
+        const myIndex = game.players.findIndex(p => p.isMe);
+        const me = myIndex !== -1 ? game.players[myIndex] : null;
+        const isMyTurn = game.phase === "playing" && myIndex !== -1 && game.turnIndex === myIndex && !game.pendingSideShow;
+
+        if (key === "s" && me && game.phase === "playing" && me.status !== "packed") {
+          e.preventDefault();
+          haptic(14);
+          toggleCardsLockedOpen();
+        } else if (isMyTurn && (!client.turnGuardUntil || Date.now() >= client.turnGuardUntil)) {
+          if (key === "b" || e.key === " ") {
+            e.preventDefault();
+            haptic(14);
+            sendIntent({ type: "BET", raise: false });
+          } else if (key === "r") {
+            e.preventDefault();
+            haptic(16);
+            sendIntent({ type: "BET", raise: true });
+          } else if (key === "x") {
+            e.preventDefault();
+            handlePackButtonClick();
+          } else if (e.key === "Enter") {
+            const activeCount = game.players.filter(p => p.status === "blind" || p.status === "seen").length;
+            if (activeCount === 2) {
+              e.preventDefault();
+              haptic(20);
+              sendIntent({ type: "SHOW" });
+            }
+          }
+        } else if (game.phase === "showdown" && client.role === "host" && e.key === "Enter") {
+          const revealLocked = client.showdownRevealedAt && Date.now() - client.showdownRevealedAt < 2300;
+          if (!revealLocked) {
+            e.preventDefault();
+            haptic(16);
+            sendIntent({ type: "NEXT_ROUND" });
+          }
         }
       });
 
@@ -2106,6 +2203,9 @@
         game: null,
         cardsLockedOpen: false,
         peekHolding: false,
+        lastTouchAt: 0,
+        packConfirmUntil: 0,
+        packConfirmTimer: null,
         turnGuardUntil: 0,
         lastSeenRound: 0,
         lastSeenPhase: "",
@@ -2182,46 +2282,58 @@
 
       function showScreen(name) {
         const screens = ["hostSetupScreen", "visitorJoinScreen", "lobbyScreen", "gameScreen", "settlementScreen"];
-        screens.forEach(id => document.getElementById(id).classList.add("hidden"));
-        document.getElementById("bottomActionBar").classList.add("hidden");
-        document.getElementById("reactionPickerPopup").classList.add("hidden");
+        screens.forEach(id => document.getElementById(id)?.classList.add("hidden"));
+        document.getElementById("bottomActionBar")?.classList.add("hidden");
+        document.getElementById("reactionPickerPopup")?.classList.add("hidden");
         document.body.classList.toggle("is-in-game", name === "game");
+
+        const targetEl = document.getElementById(name + "Screen");
+        if (targetEl) targetEl.classList.remove("hidden");
 
         const roomPill = document.getElementById("headerRoomPill");
         const stopBtn = document.getElementById("btnHostStopSettle");
         const hisabBtn = document.getElementById("btnHeaderHisab");
+        const leaveBtn = document.getElementById("btnHeaderLeave");
 
         if (name === "lobby" || name === "game") {
-          roomPill.classList.remove("hidden");
-          roomPill.classList.add("flex");
-          document.getElementById("headerRoomCode").textContent = client.roomCode || host.roomCode || "----";
+          roomPill?.classList.remove("hidden");
+          roomPill?.classList.add("flex");
+          const codeEl = document.getElementById("headerRoomCode");
+          if (codeEl) codeEl.textContent = client.roomCode || host.roomCode || "----";
+
+          if (leaveBtn && (name === "lobby" || client.role === "guest")) {
+            leaveBtn.classList.remove("hidden");
+            leaveBtn.classList.add("flex");
+          } else if (leaveBtn) {
+            leaveBtn.classList.add("hidden");
+            leaveBtn.classList.remove("flex");
+          }
         } else {
-          roomPill.classList.add("hidden");
-          roomPill.classList.remove("flex");
+          roomPill?.classList.add("hidden");
+          roomPill?.classList.remove("flex");
+          if (leaveBtn) {
+            leaveBtn.classList.add("hidden");
+            leaveBtn.classList.remove("flex");
+          }
         }
 
         if (name === "game") {
-          document.getElementById("gameScreen").classList.remove("hidden");
-          document.getElementById("bottomActionBar").classList.remove("hidden");
-          hisabBtn.classList.remove("hidden");
-          hisabBtn.classList.add("flex");
+          document.getElementById("bottomActionBar")?.classList.remove("hidden");
+          hisabBtn?.classList.remove("hidden");
+          hisabBtn?.classList.add("flex");
           if (client.role === "host") {
-            stopBtn.classList.remove("hidden");
-            stopBtn.classList.add("flex");
+            stopBtn?.classList.remove("hidden");
+            stopBtn?.classList.add("flex");
           } else {
-            stopBtn.classList.add("hidden");
-            stopBtn.classList.remove("flex");
+            stopBtn?.classList.add("hidden");
+            stopBtn?.classList.remove("flex");
           }
           requestScreenWakeLock();
         } else {
-          hisabBtn.classList.add("hidden");
-          hisabBtn.classList.remove("flex");
-          stopBtn.classList.add("hidden");
-          stopBtn.classList.remove("flex");
-          if (name === "hostSetup") document.getElementById("hostSetupScreen").classList.remove("hidden");
-          if (name === "visitorJoin") document.getElementById("visitorJoinScreen").classList.remove("hidden");
-          if (name === "lobby") document.getElementById("lobbyScreen").classList.remove("hidden");
-          if (name === "settlement") document.getElementById("settlementScreen").classList.remove("hidden");
+          hisabBtn?.classList.add("hidden");
+          hisabBtn?.classList.remove("flex");
+          stopBtn?.classList.add("hidden");
+          stopBtn?.classList.remove("flex");
         }
       }
 
@@ -2251,8 +2363,7 @@
             lastWinnerId: host.lastWinnerId,
             turnIndex: host.turnIndex,
             roundNumber: host.roundNumber,
-            latestFeed: host.latestFeed,
-            pendingSideShow: host.pendingSideShow
+            latestFeed: host.latestFeed
           };
           localStorage.setItem(HOST_BACKUP_KEY, JSON.stringify(payload));
         } catch (e) {}
@@ -2262,6 +2373,7 @@
         try {
           localStorage.removeItem(HOST_BACKUP_KEY);
         } catch (e) {}
+        document.getElementById("resumeBackupBanner")?.classList.add("hidden");
       }
 
       function checkForHostBackup() {
@@ -2269,49 +2381,87 @@
           const raw = localStorage.getItem(HOST_BACKUP_KEY);
           if (!raw) return;
           const data = JSON.parse(raw);
-          if (!data || !data.roomCode || Date.now() - data.savedAt > 4 * 3600 * 1000) {
+          if (!data || !data.roomCode || Date.now() - (data.savedAt || 0) > 6 * 3600 * 1000) {
             clearHostBackup();
             return;
           }
           const banner = document.getElementById("resumeBackupBanner");
-          const txt = document.getElementById("resumeBackupText");
-          txt.textContent = `${data.roomCode} • Round #${data.roundNumber || 0} • ${data.players.length} Players`;
-          banner.classList.remove("hidden");
+          const text = document.getElementById("resumeBackupText");
+          if (banner && text) {
+            text.textContent = `Table ${data.roomCode} • ${data.players?.length || 1} players • R${data.roundNumber || 0}`;
+            banner.classList.remove("hidden");
+          }
         } catch (e) {}
       }
 
       function discardSavedHostBackup() {
         clearHostBackup();
-        document.getElementById("resumeBackupBanner").classList.add("hidden");
       }
 
       function resumeSavedHostTable() {
         try {
           const raw = localStorage.getItem(HOST_BACKUP_KEY);
           if (!raw) return;
-          const backup = JSON.parse(raw);
-          document.getElementById("resumeBackupBanner").classList.add("hidden");
-          bootHostPeer(0, backup);
+          const data = JSON.parse(raw);
+          if (!data || !data.roomCode) return;
+
+          Object.assign(host, {
+            active: true,
+            isBotMode: false,
+            roomCode: data.roomCode,
+            hostToken: CLIENT_TOKEN,
+            totalPlayers: data.totalPlayers || 4,
+            betAmount: data.betAmount || 20,
+            turnDurationSec: data.turnDurationSec ?? 25,
+            variant: data.variant || "classic",
+            jokerRank: data.jokerRank ?? null,
+            maxBlindTurns: data.maxBlindTurns || 0,
+            potLimitMult: data.potLimitMult || 0,
+            autoNextRoundSec: data.autoNextRoundSec || 0,
+            autoNextDeadline: null,
+            turnDeadline: null,
+            players: (data.players || []).map(p => ({
+              ...p,
+              connected: p.id === CLIENT_TOKEN || Boolean(p.isBot)
+            })),
+            spectators: [],
+            hisabLog: data.hisabLog || [],
+            started: Boolean(data.started),
+            settled: false,
+            phase: data.phase || "lobby",
+            wasActualShow: Boolean(data.wasActualShow),
+            roundResultSeq: data.roundResultSeq || 0,
+            currentStake: data.currentStake || data.betAmount || 20,
+            pot: data.pot || 0,
+            dealerIndex: data.dealerIndex || 0,
+            lastWinnerId: data.lastWinnerId || null,
+            turnIndex: data.turnIndex || 0,
+            roundNumber: data.roundNumber || 0,
+            latestFeed: data.latestFeed || "Table resumed",
+            pendingSideShow: null,
+            settlementReport: null
+          });
+
+          client.role = "host";
+          client.roomCode = host.roomCode;
+          client.lastStatusSnapshot = {};
+          client.lastNetSnapshot = {};
+
+          initHostPeer(host.roomCode);
+          startHostWatchdog();
+          if (host.started && host.phase === "playing") resetTurnTimer();
+          hostSyncAll();
+          notify(`Table ${host.roomCode} resumed`, "win");
         } catch (e) {
-          notify("Failed to restore table", "error");
+          notify("Could not resume table", "error");
         }
       }
 
-      function createMultiplayerTable() {
-        const nameInput = document.getElementById("hostNameInput");
-        const name = (nameInput.value || "").trim() || "Host";
-        persistPlayerName(name);
+      function setupHostState(roomCode, hostName, isBotMode) {
         const rules = readSetupRulesFromDOM();
-
-        client.role = "host";
-        client.myName = name;
-        client.roomCode = generateRoomCode();
-        client.lastStatusSnapshot = {};
-        client.lastNetSnapshot = {};
-
         host.active = true;
-        host.isBotMode = false;
-        host.roomCode = client.roomCode;
+        host.isBotMode = isBotMode;
+        host.roomCode = roomCode;
         host.hostToken = CLIENT_TOKEN;
         host.totalPlayers = setupState.totalPlayers;
         host.betAmount = setupState.betAmount;
@@ -2323,19 +2473,6 @@
         host.autoNextRoundSec = rules.autoNextRoundSec;
         host.autoNextDeadline = null;
         host.turnDeadline = null;
-        host.players = [{
-          id: CLIENT_TOKEN,
-          name,
-          isHost: true,
-          isBot: false,
-          connected: true,
-          disconnectedAt: null,
-          net: 0,
-          handsWon: 0,
-          blindTurnsCount: 0,
-          status: "blind",
-          cards: [null, null, null]
-        }];
         host.spectators = [];
         host.hisabLog = [];
         host.started = false;
@@ -2349,170 +2486,81 @@
         host.lastWinnerId = null;
         host.turnIndex = 0;
         host.roundNumber = 0;
-        host.latestFeed = "Waiting for players...";
+        host.latestFeed = "Ready";
         host.pendingSideShow = null;
         host.settlementReport = null;
 
-        bootHostPeer(0, null);
-      }
-
-      function bootHostPeer(retryCount = 0, backup = null) {
-        if (backup) {
-          client.role = "host";
-          client.roomCode = backup.roomCode;
-          client.lastStatusSnapshot = {};
-          client.lastNetSnapshot = {};
-          host.active = true;
-          host.isBotMode = false;
-          host.roomCode = backup.roomCode;
-          host.hostToken = CLIENT_TOKEN;
-          host.totalPlayers = backup.totalPlayers || 4;
-          host.betAmount = backup.betAmount || 20;
-          host.turnDurationSec = backup.turnDurationSec ?? 25;
-          host.variant = backup.variant || "classic";
-          host.jokerRank = backup.jokerRank || null;
-          host.maxBlindTurns = backup.maxBlindTurns || 0;
-          host.potLimitMult = backup.potLimitMult || 0;
-          host.autoNextRoundSec = backup.autoNextRoundSec || 0;
-          host.autoNextDeadline = null;
-          host.players = (backup.players || []).map(p => ({
-            ...p,
-            blindTurnsCount: p.blindTurnsCount || 0,
-            connected: p.id === CLIENT_TOKEN || Boolean(p.isBot),
-            disconnectedAt: p.id === CLIENT_TOKEN || Boolean(p.isBot) ? null : Date.now()
-          }));
-          const meHost = host.players.find(p => p.id === CLIENT_TOKEN);
-          client.myName = meHost ? meHost.name : "Host";
-          host.spectators = [];
-          host.hisabLog = backup.hisabLog || [];
-          host.started = Boolean(backup.started);
-          host.settled = false;
-          host.phase = backup.phase || "lobby";
-          host.wasActualShow = Boolean(backup.wasActualShow);
-          host.roundResultSeq = backup.roundResultSeq || 0;
-          host.currentStake = backup.currentStake || host.betAmount;
-          host.pot = backup.pot || 0;
-          host.dealerIndex = backup.dealerIndex || 0;
-          host.lastWinnerId = backup.lastWinnerId || null;
-          host.turnIndex = backup.turnIndex || 0;
-          host.roundNumber = backup.roundNumber || 0;
-          host.latestFeed = backup.latestFeed || "Table resumed";
-          host.pendingSideShow = backup.pendingSideShow || null;
-          host.settlementReport = null;
-        }
-
-        if (client.peer) {
-          try { client.peer.destroy(); } catch (e) {}
-        }
-
-        const peerId = PEER_NS + host.roomCode;
-        const peer = new Peer(peerId, {
-          config: {
-            iceServers: [
-              { urls: "stun:stun.l.google.com:19302" },
-              { urls: "stun:stun1.l.google.com:19302" },
-              { urls: "stun:stun2.l.google.com:19302" }
-            ]
-          }
-        });
-        client.peer = peer;
-
-        peer.on("open", () => {
-          setHeaderConnIndicator("online");
-          startHostWatchdog();
-          hostSyncAll();
-          if (!host.started) {
-            renderLobby();
-            showScreen("lobby");
-          } else {
-            showScreen("game");
-          }
-          notify(`Table ${host.roomCode} Ready`, "info");
-        });
-
-        peer.on("connection", conn => {
-          conn.on("data", data => onHostReceive(conn, data));
-          conn.on("close", () => {
-            for (const [tok, c] of client.guestConns.entries()) {
-              if (c === conn) {
-                client.guestConns.delete(tok);
-                const pl = host.players.find(p => p.id === tok);
-                if (pl) {
-                  pl.connected = false;
-                  pl.disconnectedAt = Date.now();
-                }
-                host.spectators = host.spectators.filter(s => s.id !== tok);
-                hostSyncAll();
-                break;
-              }
-            }
-          });
-        });
-
-        peer.on("error", err => {
-          if (err && err.type === "unavailable-id" && !backup && retryCount < 4) {
-            host.roomCode = generateRoomCode();
-            client.roomCode = host.roomCode;
-            bootHostPeer(retryCount + 1, null);
-          } else {
-            setHeaderConnIndicator("reconnecting");
-            notify("Network error: " + (err.type || "Disconnected"), "error");
-          }
-        });
-      }
-
-      /* Solo Play vs AI Bots */
-      function startSoloPracticeVsBots() {
-        const nameInput = document.getElementById("hostNameInput");
-        const name = (nameInput.value || "").trim() || "You";
-        persistPlayerName(name);
-        const rules = readSetupRulesFromDOM();
-
-        client.role = "host";
-        client.myName = name;
-        client.roomCode = "SOLO";
-        client.lastStatusSnapshot = {};
-        client.lastNetSnapshot = {};
-
-        host.active = true;
-        host.isBotMode = true;
-        host.roomCode = "SOLO";
-        host.hostToken = CLIENT_TOKEN;
-        host.totalPlayers = 4;
-        host.betAmount = setupState.betAmount;
-        host.turnDurationSec = rules.timerSec;
-        host.variant = rules.variant;
-        host.jokerRank = null;
-        host.maxBlindTurns = rules.maxBlindTurns;
-        host.potLimitMult = rules.potLimitMult;
-        host.autoNextRoundSec = rules.autoNextRoundSec;
-        host.autoNextDeadline = null;
-        host.hisabLog = [];
-        host.spectators = [];
-        host.roundNumber = 0;
-        host.dealerIndex = 0;
-        host.lastWinnerId = null;
-        host.settled = false;
-        host.started = true;
-
         host.players = [
-          { id: CLIENT_TOKEN, name, isHost: true, isBot: false, connected: true, disconnectedAt: null, net: 0, handsWon: 0, blindTurnsCount: 0, status: "blind", cards: [null, null, null] },
-          { id: "bot_aarav", name: "Aarav", isHost: false, isBot: true, connected: true, disconnectedAt: null, net: 0, handsWon: 0, blindTurnsCount: 0, status: "blind", cards: [null, null, null] },
-          { id: "bot_priya", name: "Priya", isHost: false, isBot: true, connected: true, disconnectedAt: null, net: 0, handsWon: 0, blindTurnsCount: 0, status: "blind", cards: [null, null, null] },
-          { id: "bot_bikash", name: "Bikash", isHost: false, isBot: true, connected: true, disconnectedAt: null, net: 0, handsWon: 0, blindTurnsCount: 0, status: "blind", cards: [null, null, null] }
+          {
+            id: CLIENT_TOKEN,
+            name: hostName,
+            isHost: true,
+            isBot: false,
+            connected: true,
+            disconnectedAt: null,
+            net: 0,
+            handsWon: 0,
+            blindTurnsCount: 0,
+            status: "blind",
+            cards: [null, null, null]
+          }
         ];
 
-        setHeaderConnIndicator("online");
+        client.role = "host";
+        client.roomCode = roomCode;
+        client.myName = hostName;
+        client.lastStatusSnapshot = {};
+        client.lastNetSnapshot = {};
+      }
+
+      function createMultiplayerTable() {
+        const inp = document.getElementById("hostNameInput");
+        const name = (inp?.value || "").trim().slice(0, 18) || "Host";
+        persistPlayerName(name);
+
+        const code = generateRoomCode();
+        setupHostState(code, name, false);
+        initHostPeer(code);
+        startHostWatchdog();
+        hostSyncAll();
+      }
+
+      function startSoloPracticeVsBots() {
+        const inp = document.getElementById("hostNameInput");
+        const name = (inp?.value || "").trim().slice(0, 18) || "You";
+        persistPlayerName(name);
+
+        const botNames = ["Aarav", "Sita", "Bikash", "Nisha", "Rohan", "Puja", "Kiran", "Anjali", "Suman", "Maya", "Dipak", "Gita", "Nabin", "Sabina", "Prakash", "Rina"];
+        const code = "BOTS";
+        setupHostState(code, name, true);
+
+        const count = Math.max(2, Math.min(17, setupState.totalPlayers));
+        for (let i = 1; i < count; i++) {
+          host.players.push({
+            id: "bot_" + i,
+            name: botNames[(i - 1) % botNames.length],
+            isHost: false,
+            isBot: true,
+            connected: true,
+            disconnectedAt: null,
+            net: 0,
+            handsWon: 0,
+            blindTurnsCount: 0,
+            status: "blind",
+            cards: [null, null, null]
+          });
+        }
+
+        host.started = true;
         startHostWatchdog();
         startNewRound();
-        showScreen("game");
       }
 
       function joinFromLandingForm() {
-        const code = (document.getElementById("joinCodeInput").value || "").trim().toUpperCase();
-        const name = (document.getElementById("joinNameInput").value || "").trim() || "Player";
+        const code = (document.getElementById("joinCodeInput")?.value || "").trim().toUpperCase();
+        const name = (document.getElementById("joinNameInput")?.value || "").trim().slice(0, 18) || loadSavedPlayerName() || "Player";
         if (code.length !== 4) {
-          notify("Enter 4-character code", "warn");
+          notify("Enter 4-letter table code", "warn");
           return;
         }
         persistPlayerName(name);
@@ -2520,12 +2568,9 @@
       }
 
       function submitVisitorJoin() {
-        const code = (document.getElementById("visitorRoomCodeDisplay").textContent || "").trim().toUpperCase();
-        const name = (document.getElementById("visitorNameInput").value || "").trim() || "Player";
-        if (code.length !== 4) {
-          notify("Invalid code", "error");
-          return;
-        }
+        const code = (document.getElementById("visitorRoomCodeDisplay")?.textContent || "").trim().toUpperCase();
+        const name = (document.getElementById("visitorNameInput")?.value || "").trim().slice(0, 18) || "Player";
+        if (code.length !== 4) return;
         persistPlayerName(name);
         connectAsGuest(code, name);
       }
@@ -2537,196 +2582,40 @@
           window.history.replaceState({}, "", url.toString());
         } catch (e) {}
         showScreen("hostSetup");
-      }
-
-      function setHeaderConnIndicator(state) {
-        const dot = document.getElementById("headerConnDot");
-        if (!dot) return;
-        if (state === "online") {
-          dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
-        } else {
-          dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
-        }
-      }
-
-      function connectAsGuest(roomCode, playerName) {
-        client.role = "guest";
-        client.roomCode = roomCode;
-        client.myName = playerName;
-        client.lastStatusSnapshot = {};
-        client.lastNetSnapshot = {};
-
-        if (client.peer) {
-          try { client.peer.destroy(); } catch (e) {}
-        }
-
-        const peer = new Peer({
-          config: {
-            iceServers: [
-              { urls: "stun:stun.l.google.com:19302" },
-              { urls: "stun:stun1.l.google.com:19302" },
-              { urls: "stun:stun2.l.google.com:19302" }
-            ]
-          }
-        });
-        client.peer = peer;
-
-        peer.on("open", () => {
-          openGuestConnToHost();
-          startGuestHeartbeat();
-        });
-
-        peer.on("error", err => {
-          setHeaderConnIndicator("reconnecting");
-          notify("Connection issue: " + (err.type || "Reconnecting"), "warn");
-        });
-      }
-
-      function openGuestConnToHost() {
-        if (!client.peer || !client.roomCode) return;
-        const conn = client.peer.connect(PEER_NS + client.roomCode, { reliable: true });
-        client.hostConn = conn;
-
-        conn.on("open", () => {
-          client.reconnectAttempts = 0;
-          client.lastPongAt = Date.now();
-          setHeaderConnIndicator("online");
-          conn.send({
-            type: "VISITOR_JOIN",
-            token: CLIENT_TOKEN,
-            name: client.myName
-          });
-        });
-
-        conn.on("data", data => onGuestReceive(data));
-
-        conn.on("close", () => {
-          setHeaderConnIndicator("reconnecting");
-          if (client.role === "guest" && client.roomCode && (!client.game || !client.game.settled)) {
-            scheduleGuestReconnect();
-          }
-        });
-      }
-
-      function startGuestHeartbeat() {
-        if (client.heartbeatInterval) clearInterval(client.heartbeatInterval);
-        client.heartbeatInterval = setInterval(() => {
-          if (client.role !== "guest" || !client.roomCode || (client.game && client.game.settled)) return;
-          if (client.hostConn && client.hostConn.open) {
-            try {
-              client.hostConn.send({ type: "PING", token: CLIENT_TOKEN });
-            } catch (e) {}
-            if (client.lastPongAt && Date.now() - client.lastPongAt > 10000) {
-              setHeaderConnIndicator("reconnecting");
-              scheduleGuestReconnect();
-            }
-          } else {
-            scheduleGuestReconnect();
-          }
-        }, 4000);
-      }
-
-      function scheduleGuestReconnect() {
-        if (client.reconnectTimer) return;
-        const delay = Math.min(8000, 1000 * Math.pow(2, client.reconnectAttempts));
-        client.reconnectAttempts += 1;
-        setHeaderConnIndicator("reconnecting");
-        notify("Reconnecting to table...", "warn");
-        client.reconnectTimer = setTimeout(() => {
-          client.reconnectTimer = null;
-          openGuestConnToHost();
-        }, delay);
+        checkForHostBackup();
       }
 
       function copyOrShareInviteLink() {
-        const url = new URL(window.location.href);
-        url.searchParams.set("room", client.roomCode || host.roomCode);
-        const link = url.toString();
-
-        if (navigator.share) {
-          navigator.share({
-            title: `फलास ${client.roomCode || host.roomCode}`,
-            url: link
-          }).catch(() => {});
-          return;
+        const code = client.roomCode || host.roomCode;
+        if (!code || code === "BOTS") return;
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set("room", code);
+          const shareUrl = url.toString();
+          if (navigator.share) {
+            navigator.share({
+              title: `फलास Table ${code}`,
+              text: `Join my Falas table (${code})`,
+              url: shareUrl
+            }).catch(() => {
+              if (copyTextSafe(shareUrl)) notify("Invite link copied!", "win");
+            });
+          } else if (copyTextSafe(shareUrl)) {
+            notify("Invite link copied!", "win");
+          }
+        } catch (e) {
+          if (copyTextSafe(code)) notify(`Code ${code} copied!`, "win");
         }
-        if (copyTextSafe(link)) {
-          notify("Invite link copied", "info");
-        } else {
-          notify("Code: " + (client.roomCode || host.roomCode), "info");
-        }
-      }
-
-      /* ==========================================================================
-         5. HOST AUTHORITATIVE ENGINE & ZERO-LEAK SNAPSHOTS
-         ========================================================================== */
-      const BOT_POOL_NAMES = ["Aarav", "Priya", "Bikash", "Sita", "Rohan", "Anjali", "Kiran", "Nisha", "Suman", "Pooja"];
-
-      function activePlayers() {
-        return host.players.filter(p => p.status === "blind" || p.status === "seen");
-      }
-
-      function resetTurnTimer() {
-        if (host.phase === "playing" && host.turnDurationSec > 0) {
-          host.turnDeadline = Date.now() + host.turnDurationSec * 1000;
-        } else {
-          host.turnDeadline = null;
-        }
-      }
-
-      function startHostWatchdog() {
-        if (host.watchdogInterval) clearInterval(host.watchdogInterval);
-        host.watchdogInterval = setInterval(() => {
-          if (!host.active || host.settled) return;
-
-          if (host.phase === "showdown" && host.autoNextDeadline && Date.now() >= host.autoNextDeadline) {
-            host.autoNextDeadline = null;
-            startNewRound();
-            return;
-          }
-
-          if (host.phase !== "playing") return;
-
-          // Failproof guard: auto-decline Side Show if target has been disconnected > 6s
-          if (host.pendingSideShow) {
-            const target = host.players.find(p => p.id === host.pendingSideShow.targetId);
-            const req = host.players.find(p => p.id === host.pendingSideShow.requesterId);
-            if (target && !target.connected && target.disconnectedAt && Date.now() - target.disconnectedAt > 6000) {
-              host.pendingSideShow = null;
-              host.latestFeed = `${target.name} offline — Side Show declined`;
-              if (req) advanceTurn();
-              hostSyncAll();
-              return;
-            }
-          }
-
-          if (!host.turnDeadline || host.turnDurationSec <= 0) return;
-          if (Date.now() < host.turnDeadline) return;
-
-          if (host.pendingSideShow) {
-            const target = host.players.find(p => p.id === host.pendingSideShow.targetId);
-            const req = host.players.find(p => p.id === host.pendingSideShow.requesterId);
-            host.pendingSideShow = null;
-            host.latestFeed = `${target ? target.name : "Player"} declined Side Show`;
-            if (req) advanceTurn();
-            hostSyncAll();
-            return;
-          }
-
-          const current = host.players[host.turnIndex];
-          if (current && (current.status === "blind" || current.status === "seen")) {
-            performPack(current, `${current.name} timed out`);
-          }
-        }, 300);
       }
 
       function hostAddLobbyBot() {
-        if (host.started || host.players.length >= host.totalPlayers) return;
-        const usedNames = new Set(host.players.map(p => p.name));
-        const nextName = BOT_POOL_NAMES.find(n => !usedNames.has(n)) || `Bot ${host.players.length + 1}`;
+        if (client.role !== "host" || host.started || host.players.length >= host.totalPlayers) return;
+        const botNames = ["Aarav", "Sita", "Bikash", "Nisha", "Rohan", "Puja", "Kiran", "Anjali", "Suman", "Maya"];
+        const used = new Set(host.players.map(p => p.name));
+        const picked = botNames.find(n => !used.has(n)) || `Bot ${host.players.length}`;
         host.players.push({
           id: "bot_" + Math.random().toString(36).slice(2, 8),
-          name: nextName,
+          name: picked,
           isHost: false,
           isBot: true,
           connected: true,
@@ -2740,72 +2629,253 @@
         hostSyncAll();
       }
 
-      function hostStartGameNow() {
-        if (host.players.length < 2) {
-          notify("Need 2+ players", "warn");
-          return;
-        }
-        host.started = true;
-        startNewRound();
-      }
-
-      function hostKickLobbyPlayer(targetId) {
-        if (host.started) return;
-        host.players = host.players.filter(p => p.id !== targetId);
-        const conn = client.guestConns.get(targetId);
+      function hostKickLobbyPlayer(playerId) {
+        if (client.role !== "host" || host.started) return;
+        const idx = host.players.findIndex(p => p.id === playerId && !p.isHost);
+        if (idx === -1) return;
+        host.players.splice(idx, 1);
+        const conn = client.guestConns.get(playerId);
         if (conn) {
-          try { conn.send({ type: "KICKED" }); conn.close(); } catch (e) {}
-          client.guestConns.delete(targetId);
+          try { conn.send({ type: "KICKED" }); } catch (e) {}
+          try { conn.close(); } catch (e) {}
+          client.guestConns.delete(playerId);
         }
         hostSyncAll();
       }
 
-      function startNewRound() {
-        if (host.botTurnTimer) {
-          clearTimeout(host.botTurnTimer);
-          host.botTurnTimer = null;
-        }
-        host.autoNextDeadline = null;
+      function hostStartGameNow() {
+        if (client.role !== "host" || host.started || host.players.length < 2) return;
+        host.started = true;
+        startNewRound();
+      }
 
-        if (host.spectators.length > 0) {
-          const queued = host.spectators.filter(s => s.queued);
-          queued.forEach(s => {
-            if (host.players.length < 17 && !host.players.some(p => p.id === s.id)) {
-              host.players.push({
-                id: s.id,
-                name: s.name,
-                isHost: false,
-                isBot: false,
-                connected: true,
-                disconnectedAt: null,
-                net: 0,
-                handsWon: 0,
-                blindTurnsCount: 0,
-                status: "blind",
-                cards: [null, null, null]
-              });
+      function setHeaderConnIndicator(state) {
+        const dot = document.getElementById("headerConnDot");
+        if (!dot) return;
+        if (state === "online") {
+          dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+        } else if (state === "reconnecting") {
+          dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+        } else {
+          dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        }
+      }
+
+      function initHostPeer(roomCode) {
+        if (client.peer) {
+          try { client.peer.destroy(); } catch (e) {}
+        }
+        client.guestConns.clear();
+        if (typeof Peer === "undefined") {
+          notify("PeerJS unavailable — use Play vs Bots", "warn");
+          return;
+        }
+        setHeaderConnIndicator("reconnecting");
+        const peer = new Peer(PEER_NS + roomCode);
+        client.peer = peer;
+
+        peer.on("open", () => {
+          setHeaderConnIndicator("online");
+        });
+
+        peer.on("connection", conn => {
+          conn.on("data", data => onHostReceive(conn, data));
+          conn.on("close", () => {
+            for (const [tok, c] of client.guestConns.entries()) {
+              if (c === conn) {
+                client.guestConns.delete(tok);
+                const pl = host.players.find(p => p.id === tok);
+                if (pl) {
+                  pl.connected = false;
+                  pl.disconnectedAt = Date.now();
+                  hostSyncAll();
+                }
+                break;
+              }
             }
           });
-          host.spectators = host.spectators.filter(s => !host.players.some(p => p.id === s.id));
+        });
+
+        peer.on("error", err => {
+          if (err && err.type === "unavailable-id") {
+            const newCode = generateRoomCode();
+            host.roomCode = newCode;
+            client.roomCode = newCode;
+            initHostPeer(newCode);
+            hostSyncAll();
+          } else {
+            setHeaderConnIndicator("offline");
+          }
+        });
+      }
+
+      function connectAsGuest(roomCode, playerName) {
+        client.role = "guest";
+        client.roomCode = roomCode;
+        client.myName = playerName;
+        client.lastStatusSnapshot = {};
+        client.lastNetSnapshot = {};
+
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set("room", roomCode);
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) {}
+
+        if (client.heartbeatInterval) clearInterval(client.heartbeatInterval);
+        if (client.reconnectTimer) clearTimeout(client.reconnectTimer);
+        if (client.peer) {
+          try { client.peer.destroy(); } catch (e) {}
+        }
+
+        if (typeof Peer === "undefined") {
+          notify("Network library unavailable", "error");
+          return;
+        }
+
+        setHeaderConnIndicator("reconnecting");
+        const peer = new Peer();
+        client.peer = peer;
+
+        peer.on("open", () => {
+          const conn = peer.connect(PEER_NS + roomCode, { reliable: true });
+          client.hostConn = conn;
+
+          conn.on("open", () => {
+            client.reconnectAttempts = 0;
+            client.lastPongAt = Date.now();
+            setHeaderConnIndicator("online");
+            conn.send({
+              type: "VISITOR_JOIN",
+              token: CLIENT_TOKEN,
+              name: playerName
+            });
+          });
+
+          conn.on("data", data => onGuestReceive(data));
+
+          conn.on("close", () => {
+            setHeaderConnIndicator("reconnecting");
+            if (client.role === "guest" && client.roomCode === roomCode && client.reconnectAttempts < 6) {
+              client.reconnectAttempts += 1;
+              client.reconnectTimer = setTimeout(() => {
+                connectAsGuest(roomCode, playerName);
+              }, 1600);
+            } else {
+              setHeaderConnIndicator("offline");
+            }
+          });
+        });
+
+        peer.on("error", () => {
+          setHeaderConnIndicator("offline");
+          notify("Could not reach table " + roomCode, "error");
+        });
+
+        client.heartbeatInterval = setInterval(() => {
+          if (client.role === "guest" && client.hostConn && client.hostConn.open) {
+            try { client.hostConn.send({ type: "PING" }); } catch (e) {}
+          }
+        }, 4000);
+      }
+
+      function activePlayers() {
+        return host.players.filter(p => p.status === "blind" || p.status === "seen");
+      }
+
+      function resetTurnTimer() {
+        if (host.turnDurationSec > 0 && host.phase === "playing") {
+          host.turnDeadline = Date.now() + host.turnDurationSec * 1000;
+        } else {
+          host.turnDeadline = null;
+        }
+      }
+
+      function advanceTurn() {
+        const total = host.players.length;
+        if (total === 0) return;
+        for (let step = 1; step <= total; step++) {
+          const idx = (host.turnIndex + step) % total;
+          const cand = host.players[idx];
+          if (cand && (cand.status === "blind" || cand.status === "seen")) {
+            host.turnIndex = idx;
+            resetTurnTimer();
+            return;
+          }
+        }
+      }
+
+      function startHostWatchdog() {
+        if (host.watchdogInterval) clearInterval(host.watchdogInterval);
+        host.watchdogInterval = setInterval(() => {
+          if (!host.active || host.settled) return;
+          const now = Date.now();
+
+          if (host.phase === "playing" && host.pendingSideShow && host.turnDeadline && now >= host.turnDeadline) {
+            const tgt = host.players.find(p => p.id === host.pendingSideShow.targetId);
+            if (tgt) {
+              resolveSideShowDecision(tgt, false);
+            } else {
+              host.pendingSideShow = null;
+              advanceTurn();
+              hostSyncAll();
+            }
+            return;
+          }
+
+          if (host.phase === "playing" && !host.pendingSideShow && host.turnDeadline && now >= host.turnDeadline) {
+            const cur = host.players[host.turnIndex];
+            if (cur && (cur.status === "blind" || cur.status === "seen")) {
+              performPack(cur, `${cur.name} timed out`);
+            }
+            return;
+          }
+
+          if (host.phase === "showdown" && host.autoNextDeadline && now >= host.autoNextDeadline) {
+            host.autoNextDeadline = null;
+            startNewRound();
+          }
+        }, 500);
+      }
+
+      function startNewRound() {
+        if (!host.active || host.settled) return;
+
+        // Seat queued spectators if space is available (up to 17)
+        while (host.players.length < 17 && host.spectators.some(s => s.queued)) {
+          const sIdx = host.spectators.findIndex(s => s.queued);
+          const spec = host.spectators.splice(sIdx, 1)[0];
+          host.players.push({
+            id: spec.id,
+            name: spec.name,
+            isHost: false,
+            isBot: false,
+            connected: true,
+            disconnectedAt: null,
+            net: 0,
+            handsWon: 0,
+            blindTurnsCount: 0,
+            status: "blind",
+            cards: [null, null, null]
+          });
         }
 
         host.roundNumber += 1;
-        host.pot = 0;
-        host.currentStake = host.betAmount;
+        if (host.roundNumber === 1) {
+          host.dealerIndex = 0;
+        } else if (host.lastWinnerId) {
+          const wIdx = host.players.findIndex(p => p.id === host.lastWinnerId);
+          host.dealerIndex = wIdx !== -1 ? wIdx : (host.dealerIndex + 1) % host.players.length;
+        } else {
+          host.dealerIndex = (host.dealerIndex + 1) % host.players.length;
+        }
+
         host.phase = "playing";
         host.wasActualShow = false;
         host.pendingSideShow = null;
-
-        if (host.roundNumber > 1) {
-          const winnerIdx = host.lastWinnerId
-            ? host.players.findIndex(p => p.id === host.lastWinnerId)
-            : -1;
-          if (winnerIdx !== -1) {
-            host.dealerIndex = winnerIdx;
-          } else {
-            host.dealerIndex = (host.dealerIndex + 1) % host.players.length;
-          }
-        }
+        host.autoNextDeadline = null;
+        host.currentStake = host.betAmount;
+        host.pot = 0;
 
         const deck = shuffledDeck();
         host.jokerRank = host.variant === "joker" ? deck.pop().r : null;
@@ -2826,19 +2896,6 @@
 
         resetTurnTimer();
         hostSyncAll();
-      }
-
-      function advanceTurn() {
-        const total = host.players.length;
-        for (let step = 1; step <= total; step++) {
-          const idx = (host.turnIndex + step) % total;
-          const cand = host.players[idx];
-          if (cand.status === "blind" || cand.status === "seen") {
-            host.turnIndex = idx;
-            resetTurnTimer();
-            return;
-          }
-        }
       }
 
       function findAdjacentActivePlayers(fromIndex, playersArr = host.players) {
@@ -2926,21 +2983,30 @@
         host.phase = "showdown";
         host.turnDeadline = null;
 
-        recordRoundCompletion(wonAmount, bestPlayer.name, `${bestEval.label} (Pot Limit)`, true);
-        host.latestFeed = `Pot Limit Show! ${bestPlayer.name} wins ${rs(wonAmount)} • ${bestEval.label}`;
+        recordRoundCompletion(wonAmount, bestPlayer.name, bestEval.label, true);
+        host.latestFeed = `Pot Limit Showdown • ${bestPlayer.name} wins ${rs(wonAmount)} • ${bestEval.label}`;
         hostSyncAll();
       }
 
-      function performBet(player) {
+      function performBet(player, isRaise = false) {
         const isBlind = player.status === "blind";
         if (isBlind && host.maxBlindTurns > 0 && (player.blindTurnsCount || 0) >= host.maxBlindTurns) {
           return;
         }
+        const maxStakeCap = host.betAmount * 16;
+        if (isRaise && host.currentStake < maxStakeCap) {
+          host.currentStake = Math.min(maxStakeCap, host.currentStake * 2);
+        } else {
+          isRaise = false;
+        }
+
         const amount = isBlind ? host.currentStake : host.currentStake * 2;
         if (isBlind) player.blindTurnsCount = (player.blindTurnsCount || 0) + 1;
         player.net -= amount;
         host.pot += amount;
-        host.latestFeed = `${player.name} • ${isBlind ? "Blind" : "Chaal"} ${rs(amount)}`;
+        host.latestFeed = isRaise
+          ? `${player.name} • Raised 2x ${rs(amount)}`
+          : `${player.name} • ${isBlind ? "Blind" : "Chaal"} ${rs(amount)}`;
 
         if (host.potLimitMult > 0 && host.pot >= host.betAmount * host.potLimitMult) {
           triggerPotLimitAutoShowdown();
@@ -2964,7 +3030,7 @@
           host.pot = 0;
           host.phase = "showdown";
           host.turnDeadline = null;
-          recordRoundCompletion(wonAmount, winner.name, "Packed", false);
+          recordRoundCompletion(wonAmount, winner.name, "Won by Fold", false);
           host.latestFeed = customFeed
             ? `${customFeed} • ${winner.name} wins ${rs(wonAmount)}`
             : `${winner.name} wins ${rs(wonAmount)}`;
@@ -3271,7 +3337,8 @@
           settlementReport: host.settlementReport,
           players: host.players.map(p => {
             const isMe = p.id === recipientToken;
-            const canSeeCards = isShowdown || (isMe && p.status === "seen");
+            const revealedInActualShow = isShowdown && host.wasActualShow && p.status !== "packed";
+            const canSeeCards = revealedInActualShow || (isMe && p.status === "seen");
             return {
               id: p.id,
               name: p.name,
@@ -3464,7 +3531,7 @@
         if (player.status !== "blind" && player.status !== "seen") return;
 
         if (msg.type === "BET") {
-          performBet(player);
+          performBet(player, Boolean(msg.raise));
         } else if (msg.type === "PACK") {
           performPack(player);
         } else if (msg.type === "SIDE_SHOW") {
@@ -3472,6 +3539,54 @@
         } else if (msg.type === "SHOW") {
           performFinalShow(player);
         }
+      }
+      function startPeekHold(isTouch = false) {
+        if (isTouch) {
+          client.lastTouchAt = Date.now();
+        } else if (client.lastTouchAt && Date.now() - client.lastTouchAt < 500) {
+          return;
+        }
+        const game = client.game;
+        if (!game || game.phase !== "playing") return;
+        const me = game.players.find(p => p.isMe);
+        if (!me || me.status === "packed") return;
+        client.peekHolding = true;
+        if (me.status === "blind") {
+          client.cardsLockedOpen = true;
+          SoundFX.cardFlip();
+          sendIntent({ type: "SEE_CARDS" });
+        } else {
+          renderGameTable(false);
+        }
+      }
+
+      function endPeekHold() {
+        if (!client.peekHolding) return;
+        client.peekHolding = false;
+        renderGameTable(false);
+      }
+
+      function handlePackButtonClick() {
+        const now = Date.now();
+        if (client.packConfirmUntil && now < client.packConfirmUntil) {
+          client.packConfirmUntil = 0;
+          if (client.packConfirmTimer) {
+            clearTimeout(client.packConfirmTimer);
+            client.packConfirmTimer = null;
+          }
+          haptic(18);
+          sendIntent({ type: "PACK" });
+          return;
+        }
+        client.packConfirmUntil = now + 2600;
+        haptic(10);
+        renderBottomActionBarOnly();
+        if (client.packConfirmTimer) clearTimeout(client.packConfirmTimer);
+        client.packConfirmTimer = setTimeout(() => {
+          client.packConfirmUntil = 0;
+          client.packConfirmTimer = null;
+          renderBottomActionBarOnly();
+        }, 2650);
       }
 
       function onGuestReceive(msg) {
@@ -3888,27 +4003,6 @@
         renderGameTable(false);
       }
 
-      function startPeekHold() {
-        const game = client.game;
-        if (!game || game.phase !== "playing") return;
-        const me = game.players.find(p => p.isMe);
-        if (!me || me.status === "packed") return;
-        client.peekHolding = true;
-        if (me.status === "blind") {
-          client.cardsLockedOpen = true;
-          SoundFX.cardFlip();
-          sendIntent({ type: "SEE_CARDS" });
-        } else {
-          renderGameTable(false);
-        }
-      }
-
-      function endPeekHold() {
-        if (!client.peekHolding) return;
-        client.peekHolding = false;
-        renderGameTable(false);
-      }
-
       /* Side Show Convenience Helpers & Modals */
       function initiateSideShowFromDock() {
         const game = client.game;
@@ -4073,12 +4167,15 @@
           track.classList.remove("opacity-100");
           track.classList.add("opacity-0");
         }
-      }, 120);
 
-      function renderGameTable(isNewDeal, newlySeenPlayers = []) {
+        if (game && game.phase === "showdown" && game.autoNextDeadline) {
+          renderBottomActionBarOnly();
+        }
+      }, 150);
+
+      function renderGameTable(isNewDeal = false, newlySeenPlayers = []) {
         const game = client.game;
         if (!game) return;
-
         const newlySeenIds = new Set(newlySeenPlayers.map(p => p.id));
 
         const potEl = document.getElementById("potValue");
@@ -4170,12 +4267,12 @@
           const hasCardsData = me.cards && me.cards[0] !== null;
 
           const isFaceUp = hasCardsData && (
-            game.phase === "showdown" ||
+            (game.phase === "showdown" && game.wasActualShow && !isPacked) ||
             (me.status === "seen" && (client.peekHolding || client.cardsLockedOpen))
           );
 
           let cardWrapStyle = "silk-surface border-emerald-400/25";
-          if (isWinner) cardWrapStyle = "silk-surface border-amber-400";
+          if (isWinner) cardWrapStyle = "silk-surface winner-silk-aura";
           else if (isMyTurn) cardWrapStyle = "silk-surface my-turn-silk-aura";
           else if (isPacked) cardWrapStyle = "silk-inset border-slate-700/70 opacity-75";
 
@@ -4211,10 +4308,10 @@
                 <div class="flex flex-col items-center">
                   <div
                     data-my-cards-row
-                    onmousedown="startPeekHold()"
+                    onmousedown="startPeekHold(false)"
                     onmouseup="endPeekHold()"
                     onmouseleave="endPeekHold()"
-                    ontouchstart="startPeekHold()"
+                    ontouchstart="startPeekHold(true)"
                     ontouchend="endPeekHold()"
                     oncontextmenu="return false"
                     class="select-none flex items-center justify-center gap-2.5 sm:gap-4 cursor-pointer"
@@ -4253,6 +4350,12 @@
                     Hide
                   </span>
                 ` : ""}
+              `;
+            } else if (me.status === "blind" && game.phase === "playing") {
+              footerEl.innerHTML = `
+                <span onclick="haptic(14); toggleCardsLockedOpen()" class="cursor-pointer px-3 py-0.5 rounded-full silk-inset border border-amber-400/30 text-amber-200/85 text-[11px] font-bold">
+                  Tap cards to See
+                </span>
               `;
             } else if (me.status === "seen" && game.phase === "playing") {
               footerEl.innerHTML = `
@@ -4318,10 +4421,10 @@
           const isWinner = p.status === "winner";
           const isPacked = p.status === "packed";
           const isSeen = p.status === "seen";
-          const showOppCards = game.phase === "showdown" && p.cards && p.cards[0] !== null;
+          const showOppCards = game.phase === "showdown" && game.wasActualShow && !isPacked && p.cards && p.cards[0] !== null;
 
           let wrap = "silk-surface border-emerald-400/20";
-          if (isWinner) wrap = "silk-surface border-amber-400";
+          if (isWinner) wrap = "silk-surface winner-silk-aura";
           else if (isTurn) wrap = "silk-surface opp-turn-silk-aura";
           else if (isPacked) wrap = "silk-inset border-slate-700/55 opacity-60";
           else if (isSeen) wrap = "silk-surface border-emerald-400/45";
@@ -4397,8 +4500,14 @@
         if (game.phase === "showdown") {
           const isHost = client.role === "host";
           const revealLocked = client.showdownRevealedAt && Date.now() - client.showdownRevealedAt < 2300;
+          const autoSec = game.autoNextDeadline ? Math.max(1, Math.ceil((game.autoNextDeadline - Date.now()) / 1000)) : 0;
 
           if (isHost) {
+            const btnLabel = revealLocked
+              ? "Showdown..."
+              : autoSec > 0
+                ? `${t("nextRound").replace(" →", "")} (${autoSec}s) →`
+                : t("nextRound");
             bar.innerHTML = `
               <div class="w-full flex items-center justify-center">
                 <div
@@ -4408,7 +4517,7 @@
                   onclick="haptic(16); sendIntent({ type: 'NEXT_ROUND' })"
                   class="btn-div px-7 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 text-felt-950 font-black text-xs sm:text-sm"
                 >
-                  ${revealLocked ? "Showdown..." : esc(t("nextRound"))}
+                  ${esc(btnLabel)}
                 </div>
               </div>
             `;
@@ -4417,7 +4526,7 @@
             bar.innerHTML = `
               <div class="w-full flex items-center justify-center gap-2 py-1 text-xs sm:text-sm font-semibold text-emerald-100">
                 <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                <span>Waiting for <strong class="text-amber-300">${esc(hostPlayer ? hostPlayer.name : "Host")}</strong></span>
+                <span>${autoSec > 0 ? `Next round in <strong class="text-amber-300">${autoSec}s</strong>` : `Waiting for <strong class="text-amber-300">${esc(hostPlayer ? hostPlayer.name : "Host")}</strong>`}</span>
               </div>
             `;
           }
@@ -4519,8 +4628,12 @@
         const activeList = game.players.filter(p => p.status === "blind" || p.status === "seen");
         const isBlind = me.status === "blind";
         const callAmt = isBlind ? game.currentStake : game.currentStake * 2;
+        const maxStakeCap = game.betAmount * 16;
+        const canRaise = game.currentStake < maxStakeCap;
+        const raiseAmt = callAmt * 2;
         const guardAttr = client.turnGuardUntil && Date.now() < client.turnGuardUntil ? 'data-disabled="true"' : "";
         const blindCapReached = isBlind && game.maxBlindTurns > 0 && (me.blindTurnsCount || 0) >= game.maxBlindTurns;
+        const isPackConfirming = client.packConfirmUntil && Date.now() < client.packConfirmUntil;
 
         const eligibleSideShowTargets = (activeList.length >= 3 && me.status === "seen")
           ? getEligibleSideShowTargets(myIndex, game.players)
@@ -4533,7 +4646,7 @@
         const canShow = activeList.length === 2;
 
         bar.innerHTML = `
-          <div class="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+          <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <div class="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-2 rounded-xl bg-amber-400/15 border border-amber-300/45 text-amber-200 text-[10px] sm:text-xs font-black uppercase tracking-wider shrink-0">
               <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-300"></span>
               <span class="turn-pill-label-full">${esc(t("yourTurn"))}</span>
@@ -4544,7 +4657,7 @@
                 role="button"
                 tabindex="0"
                 onclick="haptic(16); toggleCardsLockedOpen()"
-                class="btn-div px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
+                class="btn-div px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
               >
                 ${esc(t("seeCards"))}
               </div>
@@ -4555,15 +4668,26 @@
                 role="button"
                 tabindex="0"
                 ${guardAttr}
-                onclick="haptic(14); sendIntent({ type: 'BET' })"
-                class="btn-div px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
+                onclick="haptic(14); sendIntent({ type: 'BET', raise: false })"
+                class="btn-div px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-extrabold text-[11px] sm:text-sm whitespace-nowrap shrink-0"
               >
                 ${isBlind ? esc(t("blind")) : esc(t("chaal"))} ${rs(callAmt)}
               </div>
+              ${canRaise ? `
+                <div
+                  role="button"
+                  tabindex="0"
+                  ${guardAttr}
+                  onclick="haptic(16); sendIntent({ type: 'BET', raise: true })"
+                  class="btn-div px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl silk-surface border border-emerald-300/45 text-emerald-200 font-black text-[11px] sm:text-xs whitespace-nowrap shrink-0"
+                >
+                  2x ${rs(raiseAmt)}
+                </div>
+              ` : ""}
             ` : ""}
           </div>
 
-          <div class="ml-auto flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <div class="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
             ${canSideShow ? `
               <div
                 role="button"
@@ -4592,10 +4716,10 @@
               role="button"
               tabindex="0"
               ${guardAttr}
-              onclick="haptic(12); sendIntent({ type: 'PACK' })"
-              class="btn-div silk-pack-btn px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl font-bold text-[11px] sm:text-xs whitespace-nowrap shrink-0"
+              onclick="handlePackButtonClick()"
+              class="btn-div silk-pack-btn ${isPackConfirming ? "pack-confirm-active" : ""} px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl font-bold text-[11px] sm:text-xs whitespace-nowrap shrink-0"
             >
-              ${esc(t("pack"))}
+              ${isPackConfirming ? "Confirm?" : esc(t("pack"))}
             </div>
           </div>
         `;
@@ -4720,12 +4844,32 @@
         client.role = null;
         client.roomCode = "";
         client.game = null;
+        if (host.watchdogInterval) clearInterval(host.watchdogInterval);
+        if (host.botTurnTimer) clearTimeout(host.botTurnTimer);
+        if (client.heartbeatInterval) clearInterval(client.heartbeatInterval);
+        if (client.reconnectTimer) clearTimeout(client.reconnectTimer);
         if (client.peer) {
           try { client.peer.destroy(); } catch (e) {}
           client.peer = null;
         }
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("room");
+          window.history.replaceState({}, "", url.toString());
+        } catch (e) {}
         showScreen("hostSetup");
         checkForHostBackup();
+      }
+
+      function leaveCurrentTable() {
+        if (client.role === "host" && host.started && !host.settled) {
+          openSettleConfirmModal();
+          return;
+        }
+        if (client.role === "host") {
+          clearHostBackup();
+        }
+        returnToHomeScreen();
       }
 
       function toggleHeaderMenu() {
@@ -4840,6 +4984,10 @@
           const room = (params.get("room") || "").trim().toUpperCase();
           if (room && room.length === 4) {
             document.getElementById("visitorRoomCodeDisplay").textContent = room;
+            if (savedName) {
+              connectAsGuest(room, savedName);
+              return;
+            }
             showScreen("visitorJoin");
             return;
           }
